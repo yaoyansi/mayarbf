@@ -1,0 +1,21 @@
+
+//createNode xxRBF;
+global proc AExxRBFTemplate( string $nodeName )
+{
+	AEswatchDisplay $nodeName;
+	editorTemplate -beginScrollLayout;
+		//
+		editorTemplate -beginLayout "Node Attributes" -collapse 0;
+			editorTemplate -addControl "PointIndex_Base";
+			editorTemplate -addControl "PointIndex_Target";
+		editorTemplate -endLayout;
+
+	 	//editorTemplate -beginLayout "UV Coordinates" -collapse 0;
+		//editorTemplate -endLayout;
+
+		// include/call base class/node attributes
+		AEdependNodeTemplate $nodeName;
+		editorTemplate -addExtraControls;
+
+	editorTemplate -endScrollLayout;
+}

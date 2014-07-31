@@ -1,0 +1,518 @@
+proc string[] getShapes( string $xform )
+{
+   string $shapes[];
+
+   $shapes[0] = $xform;
+
+   if ( "transform" == `nodeType $xform` )
+   // If given node is not a transform, assume it is a shape
+   // and pass it through
+   {
+      $shapes = `listRelatives -fullPath -shapes $xform`;
+   }
+
+   return $shapes;
+}
+proc string getShape( string $xform )
+{
+	string $shapes[];
+	$shapes = getShapes($xform);
+
+	return $shapes[0];
+}
+//-----------------------------------------------------
+global string $xxRBFNodeType = "xxRBF";
+global string $xxRBFNodeInst = "";
+
+global string $xxRBFParameterNodeType = "xxRBFParameter";
+global string $xxRBFParameterNodeInst = "";
+//
+global proc xxRBF_CreateXXRBFNode()
+{
+	//--------------------------------------------------
+	global string $xxRBFNodeType;
+	global string $xxRBFNodeInst;
+	//--------------------------------------------------
+	xxu_log2("RBF", "xxRBF_CreateXXRBFNode()");
+
+	//$xxRBFNodeInst = `createNode $xxRBFNodeType`;
+	$xxRBFNodeInst = xxu_getSingletonNode( $xxRBFNodeType );
+}
+//
+global proc xxRBF_RBFCMD_Init()
+{
+	//xxu_log2("RBF", "RBFCMD_Init()");
+
+	xxu_log2("RBF", "xxRBFCmd -init");
+	xxRBFCmd -init;
+}
+//--------------------------------------------------------------------------------------
+global proc xxRBF_RBFCMD_Update()
+{
+	//xxu_log2("RBF", "RBFCMD_Update()");
+
+	xxu_log2("RBF", "xxRBFCmd -update");
+	xxRBFCmd -update;
+}
+global proc xxRBF_RBFCMD_UpdateSkeleton()
+{
+	//xxu_log2("RBF", "xxRBF_RBFCMD_UpdateSkeleton()");
+
+	xxu_log2("RBF", "xxRBFCmd -update -updateSkeleton");
+	xxRBFCmd -update -updateSkeleton;
+}
+//--------------------------------------------------------------------------------------
+global proc xxRBF_CreateRBFParameterNode()
+{
+	//--------------------------------------------------
+	global string $xxRBFParameterNodeType;
+	//--------------------------------------------------
+	xxu_log2("RBF", "CreateRBFParameterNode()");
+
+	string $rbfParameterNode = xxu_getSingletonNode( $xxRBFParameterNodeType );
+	xxu_log2("RBF", "get singleton RBF Parameter node:"+ $rbfParameterNode );
+}
+//--------------------------------------------------------------------------------------
+global string $XX_RBF_BASE     = "base_";
+global string $XX_RBF_TARGET   = "target_";
+global string $XX_RBF_L1     = "L1_";
+global string $XX_RBF_L2     = "L2_";
+
+global string $XX_RBF_LOCATOR = "loc_";
+global string $XX_RBF_CPM     = "cpm_";
+
+global string $CPM[];
+global string $LOCF[];
+
+global string $BASE;
+global string $TARGET;
+global string $DEFORMED;
+
+global int $xxRBF_USE_OBJECT_SPACE = 0;//1: object space; 0:world space
+//--------------------------------------------------------------------------------------
+proc string[] queryTransformNode(string $group, string $level, string $type)
+{
+	xxu_log2("RBF", "queryTransformNode("+$group+","+$level+","+$type+")" );
+
+	string $ret[];
+
+	string $b = `itemFilter -byName ($group + $level + $type + "*")`;
+	string $l = `itemFilter -byType transform`;
+	string $blf = `itemFilter -intersect $b $l`;
+
+	//xxu_log2("RBF", "lsThroughFilter "+$blf);
+	$ret = `lsThroughFilter $blf`;
+	return $ret;
+}
+
+//增加一对locator，一个针对baseMesh，一个针对targetMesh
+global proc xxRBF_AddNewPairEigenPoints()
+{
+	//--------------------------------------------------
+	global string $xxRBFNodeInst;
+	global string $XX_RBF_BASE;
+	global string $XX_RBF_TARGET;
+	global string $XX_RBF_L1;
+	global string $XX_RBF_L2;
+	global string $XX_RBF_LOCATOR ;
+	global int $xxRBF_USE_OBJECT_SPACE;
+	//--------------------------------------------------
+	xxu_log2("RBF", "AddNewPairLocatorEigenPoints()");
+
+	//base level1 locators
+	string $b_1_loc[] = queryTransformNode($XX_RBF_BASE,   $XX_RBF_L1, $XX_RBF_LOCATOR );
+	//target level1 locators
+	string $t_1_loc[] = queryTransformNode($XX_RBF_TARGET, $XX_RBF_L1, $XX_RBF_LOCATOR );
+
+
+	$num_base = `size($b_1_loc)`;
+	$num_target = `size($t_1_loc)`;
+	if( $num_base != $num_target ){
+		xxu_error2("RBF", "ERROR:$numbase="+$num_base+", $numtarget="+$num_target);
+	}
+	
+	xxu_log2("RBF", "listConnections -source true -shapes false ("+$xxRBFNodeInst+".iBaseMesh)\n");
+	string $BaseMesh[] = `listConnections -source true -shapes false ($xxRBFNodeInst+".iBaseMesh")`;
+	xxu_log2("RBF", "listConnections -source true -shapes false ("+$xxRBFNodeInst+".iTargetMesh)\n");
+	string $TargetMesh[] = `listConnections -source true -shapes false ($xxRBFNodeInst+".iTargetMesh")`;
+
+
+	//new locator name : 
+	string $newLocator_base   = $XX_RBF_BASE   + $XX_RBF_L1 + $XX_RBF_LOCATOR + $num_base;
+	string $newLocator_target = $XX_RBF_TARGET + $XX_RBF_L1 + $XX_RBF_LOCATOR + $num_target;
+
+	//test whether the base object already exists.
+	if( `objExists $newLocator_base` ) {				//exist
+		xxu_error2("RBF", $newLocator_base +"already exists. Please delete it.");
+
+		xxu_log2("RBF","select -r "+$newLocator_base);
+		select -r $newLocator_base;
+	}else{
+		xxu_log2("RBF","spaceLocator -n "+$newLocator_base);
+		spaceLocator -n $newLocator_base;				//create
+		
+		if($xxRBF_USE_OBJECT_SPACE==1){//加入mesh的组后，locator得到的是物体坐标
+			xxu_log2("RBF","parent "+$newLocator_base+" "+$BaseMesh[0]);
+			parent $newLocator_base $BaseMesh[0];			//add to base mesh group
+		}
+	}
+
+	//test whether the target object already exists.
+	if( `objExists $newLocator_target` ) {				//exist
+		xxu_error2("RBF", $newLocator_target +"already exists. Please delete it.");
+		
+		xxu_log2("RBF","select -r "+$newLocator_target);
+		select -r $newLocator_target;
+	}else{
+		xxu_log2("RBF","spaceLocator -n "+$newLocator_target);
+		spaceLocator -n $newLocator_target;					//create
+		
+		if($xxRBF_USE_OBJECT_SPACE==1){//加入mesh的组后，locator得到的是物体坐标
+			xxu_log2("RBF","parent "+$newLocator_target+" "+$TargetMesh[0]);
+			parent $newLocator_target $TargetMesh[0];			//add to target mesh group
+		}
+
+	}
+}
+//
+proc F_base( string $locators[])
+{
+	//--------------------------------------------------
+	global string $xxRBFNodeInst;
+	//--------------------------------------------------
+	xxu_log2("RBF", "F_base():");
+	print($locators);print("\n");
+
+	if( size($locators) <=0){
+		xxu_error2("RBF", "locators is NULL;");
+		return;
+	}
+
+	xxu_log2("RBF", "set the following points to "+$xxRBFNodeInst+".PointIndex_Base[...]");
+	int $index = 0;
+	for( $locator in $locators)
+	{
+		float $closetPos[] = `getAttr ($locator+".translate")`;
+		print("<");print($closetPos[0]+", "+ $closetPos[1]+", "+ $closetPos[2] );print(">\n");
+
+		//add position
+		setAttr ($xxRBFNodeInst+".PointIndex_Base["+ $index +"]") $closetPos[0]; $index++;
+		setAttr ($xxRBFNodeInst+".PointIndex_Base["+ $index +"]") $closetPos[1]; $index++;
+		setAttr ($xxRBFNodeInst+".PointIndex_Base["+ $index +"]") $closetPos[2]; $index++;
+	}
+	
+	//delete $NODE;
+}
+proc F_target( string $locators[] )
+{
+	//--------------------------------------------------
+	global string $xxRBFNodeInst;
+	//--------------------------------------------------
+	xxu_log2("RBF", "F_target()");
+	print($locators);print("\n");
+
+	if( size($locators) <=0){
+		xxu_error2("RBF", "locators is NULL;");
+		return;
+	}
+
+	xxu_log2("RBF", "set the following points to "+$xxRBFNodeInst+".PointIndex_Base[...]");
+	int $index = 0;
+	for( $locator in $locators)
+	{
+		float $closetPos[] = `getAttr ($locator+".translate")`;
+		print("<");print($closetPos[0]+", "+ $closetPos[1]+", "+ $closetPos[2] );print(">\n");
+
+		//add position
+		setAttr ($xxRBFNodeInst+".PointIndex_Target["+ $index +"]") $closetPos[0]; $index++;
+		setAttr ($xxRBFNodeInst+".PointIndex_Target["+ $index +"]") $closetPos[1]; $index++;
+		setAttr ($xxRBFNodeInst+".PointIndex_Target["+ $index +"]") $closetPos[2]; $index++;
+	}
+	
+	//delete $NODE;
+}
+global proc xxRBF_InitilizeEigenPoints()
+{
+	//--------------------------------------------------
+	global string $xxRBFNodeInst;
+	global string $XX_RBF_BASE;
+	global string $XX_RBF_TARGET;
+	global string $XX_RBF_L1;
+	global string $XX_RBF_L2;
+	global string $XX_RBF_LOCATOR ;
+	//--------------------------------------------------
+	xxu_log2("RBF", "xxRBF_InitilizeEigenPoints()");
+
+	if(`objExists $xxRBFNodeInst`==0){
+		xxu_error2("RBF", $xxRBFNodeInst +"not exists.");
+		return;
+	}
+
+	//base level2 locators
+	string $b_2_loc[] = queryTransformNode($XX_RBF_BASE,   $XX_RBF_L2, $XX_RBF_LOCATOR );
+	print("query result=\n"); print($b_2_loc); print("\n");
+	//target level2 locators
+	string $t_2_loc[] = queryTransformNode($XX_RBF_TARGET, $XX_RBF_L2, $XX_RBF_LOCATOR );
+	print("query result=\n"); print($t_2_loc); print("\n");
+
+
+	//1.eigen points of base mesh
+	F_base( $b_2_loc );
+
+
+	//2.eigen points of target mesh
+	F_target( $t_2_loc );
+}
+//
+proc xxRBF_Generate(string $GROUP, string $meshShape, string $locators[])
+{
+	//--------------------------------------------------
+	global string $XX_RBF_BASE;
+	global string $XX_RBF_TARGET;
+	global string $XX_RBF_L1;
+	global string $XX_RBF_L2;
+	global string $XX_RBF_LOCATOR ;
+	global string $XX_RBF_CPM;
+	//--------------------------------------------------
+	xxu_log2("RBF","xxRBF_Generate("+$GROUP+", "+$meshShape+", $loators[])");
+
+	int $num = `size($locators)`;
+	for($i=0; $i<$num; ++$i) //$l in $locators
+	{
+		xxu_log2("RBF","");
+		string $cpm  = $GROUP + $XX_RBF_L2 + $XX_RBF_CPM     + $i;
+		string $locf = $GROUP + $XX_RBF_L2 + $XX_RBF_LOCATOR + $i;
+		
+		xxu_log2("RBF","createNode -n $cpm  closestPointOnMesh");
+		createNode -n $cpm  closestPointOnMesh;
+		xxu_log2("RBF","spaceLocator -n $locf");
+		spaceLocator -n $locf;//createNode -n $locf  locator;
+
+		// $l         --> $cpm
+		// $meshShape --> $cpm
+		//                $cpm --> $locf
+		xxu_log2("RBF", "connectAttr -f ("+$meshShape+".outMesh) ("+$cpm+".inMesh)");
+		connectAttr -f ($meshShape+".outMesh") ($cpm+".inMesh");
+		
+		xxu_log2("RBF", "connectAttr -f ("+$locators[$i]+".translate) ("+$cpm+".inPosition)");
+		connectAttr -f ($locators[$i]+".translate") ($cpm +".inPosition");
+		
+		xxu_log2("RBF", "connectAttr -f ("+$cpm+".position) ("+$locf+".translate)");
+		connectAttr -f ($cpm+".position") ($locf+".translate");
+
+	}
+}
+//
+global proc xxRBF_GenerateTempNodes()
+{
+	//--------------------------------------------------
+	global string $xxRBFNodeInst;
+	global string $XX_RBF_BASE;
+	global string $XX_RBF_TARGET;
+	global string $XX_RBF_L1;
+	global string $XX_RBF_L2;
+	global string $XX_RBF_LOCATOR ;
+	global int $xxRBF_USE_OBJECT_SPACE;
+	//--------------------------------------------------
+	xxu_log2("RBF", "GenerateTempNodes() -BEGIN");
+
+	//如果以前的temp nodes 未删除，则提示用户先删除之.
+	//base level2 locators
+	string $b_2_loc[] = queryTransformNode($XX_RBF_BASE,   $XX_RBF_L2, $XX_RBF_LOCATOR );
+	print("query result=\n"); print($b_2_loc); print("\n");
+	//target level2 locators
+	string $t_2_loc[] = queryTransformNode($XX_RBF_TARGET, $XX_RBF_L2, $XX_RBF_LOCATOR );
+	print("query result=\n"); print($t_2_loc); print("\n");
+	
+	if( (size($b_2_loc)>0) || (size($t_2_loc)>0) ){
+		error("Please delete old temp nodes, and then generate new temp nodes.");
+		return;
+	}
+	
+	//base level1 locators
+	string $b_1_loc[] = queryTransformNode($XX_RBF_BASE,   $XX_RBF_L1, $XX_RBF_LOCATOR );
+	print("query result=\n"); print($b_1_loc); print("\n");
+	//target level1 locators
+	string $t_1_loc[] = queryTransformNode($XX_RBF_TARGET, $XX_RBF_L1, $XX_RBF_LOCATOR );
+	print("query result=\n"); print($t_1_loc); print("\n");
+
+	// base
+	xxu_log2("RBF", "listConnections -source true -shapes false ("+$xxRBFNodeInst+".iBaseMesh)" );
+	string $BaseMesh[] = `listConnections -source true -shapes false ($xxRBFNodeInst+".iBaseMesh")`;
+	print($BaseMesh);
+	if($xxRBF_USE_OBJECT_SPACE == 0){// use world space coordination
+		//freez base mesh. so the level2 locators will get the World Space Coordination.
+		makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $BaseMesh[0];
+	}
+	xxRBF_Generate($XX_RBF_BASE, $BaseMesh[0], $b_1_loc);
+
+
+	//target
+	xxu_log2("RBF", "listConnections -source true -shapes false ("+$xxRBFNodeInst+".iTargetMesh)" );
+	string $TargetMesh[] = `listConnections -source true -shapes false ($xxRBFNodeInst+".iTargetMesh")`;
+	print($TargetMesh);
+	if($xxRBF_USE_OBJECT_SPACE == 0){// use world space coordination
+		//freez target mesh. so the level2 locators will get the World Space Coordination.
+		makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $TargetMesh[0];
+	}
+	xxRBF_Generate($XX_RBF_TARGET, $TargetMesh[0], $t_1_loc);
+
+	xxu_log2("RBF", "GenerateTempNodes() -END");
+}
+
+proc xxRBF_Delete( string $locators[] )
+{
+	xxu_log2("RBF", "Delete()");
+	print($locators); print("\n");
+
+	for( $l in $locators)
+	{
+		string $cpm;
+		string $locf;
+
+		xxu_log2("RBF", "listConnections -destination true -type  closestPointOnMesh ("+$l+".translate)");
+		string $tmp0[] = `listConnections -destination true -type "closestPointOnMesh" ($l+".translate")`;
+		$cpm = $tmp0[0];
+
+		xxu_log2("RBF", "listConnections -destination true -type transform ("+$cpm+".position)");
+		string $tmp1[] = `listConnections -destination true -type "transform" ($cpm+".position")`;//得到locator的transform节点
+		$locf = $tmp1[0];
+		
+		xxu_log2("RBF", "delete "+ $cpm);
+		delete $cpm;
+		
+		xxu_log2("RBF", "delete "+ $locf);
+		delete $locf;
+	}
+}
+
+global proc xxRBF_DeleteTempNodes()
+{	
+	//--------------------------------------------------
+	global string $XX_RBF_BASE;
+	global string $XX_RBF_TARGET;
+	global string $XX_RBF_L1;
+	global string $XX_RBF_L2;
+	global string $XX_RBF_LOCATOR ;
+	//--------------------------------------------------
+	xxu_log2("RBF", "DeleteTempNodes() -BEGIN");
+
+	//base level1 locators
+	string $b_1_loc[] = queryTransformNode($XX_RBF_BASE,   $XX_RBF_L1, $XX_RBF_LOCATOR );
+	print("query result=\n"); print($b_1_loc); print("\n");
+	//target level1 locators
+	string $t_1_loc[] = queryTransformNode($XX_RBF_TARGET, $XX_RBF_L1, $XX_RBF_LOCATOR );
+	print("query result=\n"); print($t_1_loc); print("\n");
+
+	xxRBF_Delete($b_1_loc);
+	xxRBF_Delete($t_1_loc);
+
+	xxu_log2("RBF", "DeleteTempNodes() -END");
+}
+//
+global proc xxRBF_SelectBaseTargetModels()
+{
+	//--------------------------------------------------
+	global string $BASE;
+	global string $TARGET;
+	global string $xxRBFNodeType;
+	global string $xxRBFNodeInst;
+	//--------------------------------------------------
+
+	xxu_log2("RBF","ls -sl");
+	string $selected[] =`ls -sl`;
+
+
+	if(size($selected)!=2){
+		xxu_log2("RBF","selected:");
+		print($selected);print("\n");
+		xxu_log2("RBF", "Must select 2 objects.");
+		return;
+	}
+
+	//
+	$BASE = $selected[0];
+	$TARGET = $selected[1];
+	$DEFORMED = $BASE+"_deformed";
+	
+	duplicate -rr -name $DEFORMED $BASE;
+
+	//2.connect attributes
+	//2.1 repair nodes
+	string $baseShape   = getShape($BASE);
+	xxu_log2("RBF", "$baseShape="+$baseShape);
+
+	string $targetShape = getShape($TARGET);
+	xxu_log2("RBF", "$targetShape="+$targetShape);
+
+	$xxRBFNodeInst = xxu_getSingletonNode( $xxRBFNodeType );
+	xxu_log2("RBF", "xxRBFNode="+$xxRBFNodeInst);
+
+	string $deformedShape = getShape($DEFORMED);
+	xxu_log2("RBF", "$deformedShape="+$deformedShape);
+
+	//2.2 connect
+	xxu_log2("RBF", "connectAttr ("+$baseShape+".outMesh) ("+$xxRBFNodeInst+".iBaseMesh)\n");
+	connectAttr ($baseShape+".outMesh") ($xxRBFNodeInst+".iBaseMesh");
+
+	xxu_log2("RBF", "connectAttr ("+$targetShape+".outMesh) ("+$xxRBFNodeInst+".iTargetMesh)\n");
+	connectAttr ($targetShape+".outMesh") ($xxRBFNodeInst+".iTargetMesh");
+
+	xxu_log2("RBF", "connectAttr ("+$xxRBFNodeInst+".odummy) ("+$deformedShape+".displayNormal)\n");
+	connectAttr ($xxRBFNodeInst+".odummy") ($deformedShape+".displayNormal");
+
+
+}
+global proc xxRBF_JointMapping()
+{
+	xxu_log2("RBF", "xxRBF_JointMapping()");
+	xxRBFJointMapping;
+}
+//
+global proc xxRBF_Main()
+{
+	//1.
+	xxRBF_CreateXXRBFNode();
+
+	//2.
+	window;
+		columnLayout;
+
+			text -label "deform from base to target";
+
+			separator -h 10 -w 10;//---------------------------------
+			button -label "Create XXRBF Node" -command "xxRBF_CreateXXRBFNode";
+//			button -label "Create EigenPointsNode" -command "xxRBF_CreateEigenPointsNode";
+
+			separator -h 10 -w 10;//---------------------------------
+			button -label "Select Base&Target Models" -command "xxRBF_SelectBaseTargetModels";
+
+			separator -h 10 -w 10;//---------------------------------
+//			button -label "Add Base Eigen Point" -command "xxRBF_AddBaseEigenPoint";
+//			button -label "Add Target Eigen Point" -command "xxRBF_AddTargetEigenPoint";
+			button -label "Add New Pair Eigen Points" -command "xxRBF_AddNewPairEigenPoints";
+			
+			separator -h 10 -w 10;//---------------------------------
+			button -label "Generate Temp Nodes" -command "xxRBF_GenerateTempNodes";
+			button -label "Delete Temp Nodes" -command "xxRBF_DeleteTempNodes";
+			
+			separator -h 10 -w 10;//---------------------------------
+			button -label "Initilize Eigen Points" -command "xxRBF_InitilizeEigenPoints";
+
+			separator -h 10 -w 10;//---------------------------------
+			button -label "create RBFParameterNode" -command "xxRBF_CreateRBFParameterNode";
+
+			button -label "rbfcmd -init" -command "xxRBF_RBFCMD_Init";
+			//button -label "rbfcmd -update" -command "xxRBF_RBFCMD_Update";
+			button -label "rbfcmd -updateSkeleton" -command "xxRBF_RBFCMD_UpdateSkeleton";
+			
+			separator -h 10 -w 10;//---------------------------------
+			button -label "joint mapping" -command "xxRBF_JointMapping";
+
+	showWindow;
+}
+
+//*********************************************************
+// Main Entry
+//*********************************************************
+xxRBF_Main();

@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="docs">
+      <UniqueIdentifier>{8e60d33e-ddc8-4fbd-b569-3b639027bfe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="icons">
+      <UniqueIdentifier>{2b661894-caf2-419e-a179-854e8a6b9642}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{0feb6b58-1346-4650-8bca-088df78c71b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scripts">
+      <UniqueIdentifier>{795b38aa-ca2b-41c2-9a79-3a89f5e279ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{c13dd710-fbc3-4adf-ab24-c3c7deaf874a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\rbfcore">
+      <UniqueIdentifier>{c29503bb-6c24-42d3-8561-c879628b4cd8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\scripts\AExxRBFParameterTemplate.mel">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="..\scripts\AExxRBFTemplate.mel">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="..\scripts\rbfMain.mel">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="..\depends\common\xxcommon\userSetup.mel">
+      <Filter>common</Filter>
+    </None>
+    <None Include="..\depends\common\xxcommon\xxUtility.mel">
+      <Filter>common</Filter>
+    </None>
+    <None Include="..\mayarbf.mod" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\rbfcore\NEWMAT.CPP">
+      <Filter>src\rbfcore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\rbfcore\RBFInterpolator.cpp">
+      <Filter>src\rbfcore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\rbfcore\RBFType.cpp">
+      <Filter>src\rbfcore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\rbfcore\RBFWapper.cpp">
+      <Filter>src\rbfcore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\EigenPointsNode.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PluginMain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RBFCmd.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RBFJointMapping.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RBFParameterNode.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\depends\common\xxcommon\log.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\depends\common\xxcommon\mayacheck.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\depends\common\xxcommon\typedefine.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\rbfcore\Vector3.h">
+      <Filter>src\rbfcore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\rbfcore\NEWMAT.H">
+      <Filter>src\rbfcore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\rbfcore\RBFInterpolator.h">
+      <Filter>src\rbfcore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\rbfcore\RBFType.h">
+      <Filter>src\rbfcore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\rbfcore\RBFWapper.h">
+      <Filter>src\rbfcore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\rbfcore\scalar.h">
+      <Filter>src\rbfcore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\EigenPointsNode.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RBFCmd.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RBFJointMapping.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RBFParameterNode.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\depends\common\xxcommon\log.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\depends\common\xxcommon\mayacheck.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\depends\common\xxcommon\typedefine.h">
+      <Filter>common</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

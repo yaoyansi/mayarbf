@@ -1,0 +1,103 @@
+
+//createNode xxRBFParameter;
+global proc AExxRBFParameterTemplate( string $nodeName )
+{
+	AEswatchDisplay $nodeName;
+
+	editorTemplate -beginScrollLayout;
+
+		editorTemplate -beginLayout "Node Attributes" -collapse false;
+			//
+			editorTemplate -callCustom 
+				"xxRBFParameterTypeNew"
+	   			"xxRBFParameterTypeReplace"
+				"type";
+			//
+			editorTemplate -label "c" -addControl "constant";
+		editorTemplate -endLayout;
+
+		// include/call base class/node attributes
+		AEdependNodeTemplate $nodeName;
+		editorTemplate -addExtraControls;
+
+	editorTemplate -endScrollLayout;
+}
+
+proc assertAttribute( string $attrName )
+{
+  string $nodeName[];
+  tokenize($attrName, ".", $nodeName);
+
+  if ( !`attributeQuery -node $nodeName[0] -exists $nodeName[1]` )
+    addAttr -at "short" -ln $nodeName[1] -dv 0 -min 0 $nodeName[0];
+}
+
+global proc xxRBFParameterTypeNew_Annotation()
+{
+	xxu_log2("RBF", "ParameterTypeNew_Annotation()\n");
+
+	window -title "Radio Basis Functions Annotation";
+	columnLayout -adjustableColumn true;
+		separator -h 10 -w 10;
+		text -label "               Gaussian: exp( -c * r^2 );          " -align "left";
+
+		separator -h 10 -w 10;
+		text -label "           Multiquadric: sqrt( r^2 + c^2 );        " -align "left";
+
+		separator -h 10 -w 10;
+		text -label "  PolyharmonicSplineOdd: r^c;         (c=1,3,5,...)" -align "left";
+		
+		separator -h 10 -w 10;
+		text -label "PolyharmonicSplineEvent: r^c * ln(r); (c=2,4,6,...)" -align "left";
+		text -label "      Thin Plate Spline: r^2 * ln(r);              " -align "left";
+	showWindow;
+
+}
+
+global proc xxRBFParameterTypeNew( string $attrName )
+{
+  string $nodeName[];
+  $numTokens = tokenize($attrName, ".", $nodeName);
+//   for($name in $nodeName)
+//   { 
+// 	  print("$nodeName="+$name+"\n");
+//   }
+//   print("$attrName="+$attrName+"\n");
+
+  // This hack ensures that the standard locator has the
+  // extra attribute; else, this enhancement will not work!
+  assertAttribute( $attrName );
+
+  // Push the Attribute Editor UITemplate 
+  setUITemplate -pst attributeEditorPresetsTemplate;
+	  // Add the optionMenu enumeration group.
+	  // This will be connected to the our specified attribute.
+	  attrEnumOptionMenuGrp
+		-l "Radial Basis Function type"
+		-columnAlign 1 "right"
+		-at $attrName
+		-ei 0 "Gaussian"
+		-ei 1 "Multiquadric"
+		-ei 2 "RBFT_PolyharmonicSplineOdd"
+		-ei 3 "RBFT_PolyharmonicSplineEven"
+		locatorEnumOptionMenu;
+
+	  button -label "Radio Basis Functions Annotation" -command "xxRBFParameterTypeNew_Annotation";
+  // Pop to restore the UITemplate 
+  setUITemplate -ppt;
+
+}
+global proc xxRBFParameterTypeReplace( string $attrName )
+{
+  string $nodeName[];
+  tokenize($attrName, ".", $nodeName);
+
+  // Disable the drop-down menu if the attribute does not exist
+  if ( `attributeQuery -node $nodeName[0] -exists "type"` )
+    attrEnumOptionMenuGrp -e
+       -enable true
+       -attribute $attrName
+          locatorEnumOptionMenu;
+  else
+    attrEnumOptionMenuGrp -e -enable false locatorEnumOptionMenu;
+}

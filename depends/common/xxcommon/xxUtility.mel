@@ -1,0 +1,190 @@
+
+//
+global proc xxu_log1( string $log)
+{
+	print(">"+ $log +"\n");
+}
+//
+global proc xxu_log2(string $prefix, string $log)
+{
+	print($prefix +">"+ $log +"\n");
+}
+global proc xxu_warn1( string $log)
+{
+	warning (">"+ $log +"\n");
+}
+//
+global proc xxu_warn2(string $prefix, string $log)
+{
+	warning ($prefix +">"+ $log +"\n");
+}
+global proc xxu_error1( string $log)
+{
+	error (">"+ $log +"\n");
+}
+//
+global proc xxu_error2(string $prefix, string $log)
+{
+	error ($prefix +">"+ $log +"\n");
+}
+//
+global proc string xxu_getSingletonNode(string $type)
+{
+	string $instance = $type +"1";
+	if(`objExists $instance`==0)
+	{
+		print("createNode "+$type+":"+$instance+"\n");
+		$instance = `createNode $type`;
+	}else{
+		print($instance +" already exists.\n");
+	}
+	return $instance;
+}
+//
+global proc string xxu_getSingletonNode2(string $type, string $name)
+{
+	if(`objExists $name`==0)
+	{
+		$instance = `createNode $type -n $name`;
+	}
+	return $name;
+}
+//
+global proc xxu_assertmy(int $condition, string $msg)
+{
+	if($condition == false){
+		warning ($msg +"\n");
+	}
+}
+//
+global proc string[] xxu_getShapes( string $xform )
+{
+   string $shapes[];
+
+   $shapes[0] = $xform;
+
+   if ( "transform" == `nodeType $xform` )
+   // If given node is not a transform, assume it is a shape
+   // and pass it through
+   {
+      $shapes = `listRelatives -fullPath -shapes -ni $xform`;
+   }
+
+   return $shapes;
+}
+global proc string xxu_getShape( string $xform )
+{
+	string $shapes[];
+	$shapes = xxu_getShapes($xform);
+
+	return $shapes[0];
+}
+//
+global proc string xxu_getTransform( string $shape )
+{
+   string $transform = "";
+
+   if ( "transform" != `nodeType $shape` )
+   // If given node is already a transform, just pass on through
+   {
+      string $parents[] = `listRelatives -fullPath -parent $shape`;
+      $transform = $parents[0];
+   }
+
+   return $transform;
+}
+//
+proc float[] _MatrixMult( float $float3[], float $matrix[], int $bvector )
+{
+    //xxu_log1("_MatrixMult()");
+    float $result[];
+
+	$result[0] = 0.0;
+	$result[1] = 0.0;
+	$result[2] = 0.0;
+
+	if ( size($float3) != 3 || size($matrix) != 16 )
+	{
+		warning( "size($float3)="+size($float3)+", size($matrix)="+size($matrix) );
+		warning (uiRes("m_pointMatrixMult.kPointArray"));
+		return $result;
+	}
+
+	// create the node that will do the actual computation
+	//
+    string $multNode;
+	if ( catch($multNode = `createNode pointMatrixMult`) ) 
+	{
+		warning (uiRes("m_pointMatrixMult.kCouldNotCreateNode"));
+		return $result;
+	}
+
+	// set the matrix and point inputs to the node
+	//
+    setAttr ($multNode+".vectorMultiply") $bvector;
+    setAttr ($multNode+".inPoint") -type "double3" $float3[0] $float3[1] $float3[2];
+    setAttr ($multNode+".inMatrix") -type "matrix" $matrix[0] $matrix[1] $matrix[2] $matrix[3] $matrix[4] $matrix[5] $matrix[6] $matrix[7] $matrix[8] $matrix[9] $matrix[10] $matrix[11] $matrix[12] $matrix[13] $matrix[14] $matrix[15];
+
+	// get the result and delete the node since it is no longer required
+	//
+    $result = `getAttr ($multNode+".output")`;
+    delete $multNode;
+
+    return $result;
+}
+//
+global proc float[] xxu_pointMatrixMult( float $point[], float $matrix[] )
+{
+    //xxu_log1("xxu_pointMatrixMult(size($point)="+size($point)+",size($matrix)="+size($matrix)+")");
+    return _MatrixMult($point, $matrix, 0);
+}
+//
+global proc float[] xxu_vectorMatrixMult( float $vector[], float $matrix[] )
+{
+    //xxu_log1("xxu_vectorMatrixMult(size($vector)="+size($vector)+",size($matrix)="+size($matrix)+")");
+    return _MatrixMult($vector, $matrix, 1);
+}
+//
+// @arg
+//      $pluginNamePrefix  e.g.xxu_String_2009x32d.mll的 pluginName prefix 是xxu_String.
+proc string getPluginName( string $pluginNamePrefix, int $isReleaseVersion )
+{
+	//string $pluginName = "xxu_String_";
+	string $WinPlatform = (`about -win64`==1) ?"x64":"x32";
+	string $t = `about -apiVersion`;
+	string $mayaversion = substring($t, 1, 4);
+	string $fullPluginName;
+	if( 0==$isReleaseVersion ){
+		$fullPluginName = ($pluginNamePrefix +"_"+ $mayaversion + $WinPlatform + "d.so");
+	}else{
+		$fullPluginName = ($pluginNamePrefix +"_"+ $mayaversion + $WinPlatform + ".so");
+	}
+	return $fullPluginName;
+}
+//
+// @arg
+//      $pluginNamePrefix  e.g.xxu_String_2009x32d.mll的 pluginName prefix 是xxu_String.
+global proc xxu_loadPlugin(string $pluginNamePrefix, int $isReleaseVersion )
+{
+	string $fullPluginName = getPluginName($pluginNamePrefix, $isReleaseVersion);
+	xxu_log2("xxcommon","try to load "+$fullPluginName);
+
+	if(0==`pluginInfo -query -loaded -name $fullPluginName`)
+	{
+		loadPlugin $fullPluginName;
+	}else{
+		xxu_log2("xxcommon",$fullPluginName+" already loaded.");
+	}
+}
+global proc xxu_unloadPlugin(string $pluginNamePrefix, int $isReleaseVersion )
+{
+	string $fullPluginName = getPluginName($pluginNamePrefix, $isReleaseVersion);
+	xxu_log2("xxcommon","try to unload "+$fullPluginName);	
+
+	if(1==`pluginInfo -query -loaded -name $fullPluginName`)
+	{
+		unloadPlugin $fullPluginName;
+	}else{
+		xxu_log2("xxcommon",$fullPluginName+" is already unloaded.");	
+	}
+}
