@@ -1,0 +1,1225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head 
+profile="http://gmpg.org/xfn/11">
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Noe’s tutorial on deforming 3D geometry using RBFs «  Computer 
+Graphics Lab</title>
+
+<link rel="alternate" type="application/rss+xml" title="Computer 
+Graphics Lab RSS Feed" href="http://cg.alexandra.dk/feed/">
+<link rel="alternate" type="application/atom+xml" title="Computer 
+Graphics Lab Atom Feed" href="http://cg.alexandra.dk/feed/atom/">
+<link rel="pingback" href="http://cg.alexandra.dk/xmlrpc.php">
+<link rel="shortcut icon" 
+href="http://cg.alexandra.dk/wp-content/themes/arclite/favicon.ico">
+
+
+				
+	<script src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/ga.js" async="" type="text/javascript"></script><script type="text/javascript">//<![CDATA[
+	// Google Analytics for WordPress by Yoast v4.06 | http://yoast.com/wordpress/google-analytics/
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount','UA-1629436-3']);
+	_gaq.push(['_trackPageview']);
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+	// End of Google Analytics for WordPress by Yoast v4.0
+	//]]></script>
+<style type="text/css">
+@import "http://cg.alexandra.dk/wp-content/themes/arclite/style.css";
+@import "http://cg.alexandra.dk/wp-content/themes/arclite/options/side-blue.css";
+@import "http://cg.alexandra.dk/wp-content/themes/arclite/options/content-default.css";
+#header-wrap{ background: transparent url("http://cg.alexandra.dk/wp-content/uploads/CGL_header.jpg") repeat center top; }
+/*addition JM for the Random Images*/
+.wGallery
+{
+list-style-type: none;	
+}
+
+
+
+/* additional JM for tags */
+.tags
+{
+clear: both;
+font-style: normal;
+font-size: 80%;
+}
+
+
+h1
+{
+font-size: 220%;
+font-style: italic;
+}
+
+h1.logo{
+font-style: normal;
+}
+
+.alignright
+{
+clear: right;
+}
+
+.alignleft
+{
+clear: left;
+}
+
+.wp-caption
+{
+clear:both;
+}
+
+pre,
+.code {
+ white-space:normal;
+ white-space: pre-wrap;
+ white-space: -moz-pre-wrap;
+ white-space: -pre-wrap;
+ white-space: -o-pre-wrap;
+ word-wrap: break-word;
+ font-family:courier;
+ overflow:hidden;
+}
+
+
+
+.tex
+{
+  padding: 0px;
+  margin: 0px 0px;
+
+}
+
+
+#pagetitle{font-size:75%;}
+
+
+</style>
+<!--[if lte IE 6]>
+<style type="text/css" media="screen">
+ @import "http://cg.alexandra.dk/wp-content/themes/arclite/ie6.css";
+</style>
+<![endif]-->
+
+ <link rel="alternate" type="application/rss+xml" title="Computer 
+Graphics Lab » Noe’s tutorial on deforming 3D geometry using RBFs 
+Comments Feed" 
+href="http://cg.alexandra.dk/2009/08/14/deforming-geometry-using-radial-basis-functions/feed/">
+<link rel="stylesheet" id="thickbox-css" 
+href="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/thickbox.css"
+ type="text/css" media="all">
+<script type="text/javascript" src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/jquery.js"></script>
+<script type="text/javascript" src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/swfobject.js"></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" 
+href="http://cg.alexandra.dk/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" 
+href="http://cg.alexandra.dk/wp-includes/wlwmanifest.xml"> 
+<link rel="index" title="Computer Graphics Lab" 
+href="http://cg.alexandra.dk/">
+<link rel="start" title="Simulation of Congenital Heart Surgeryproje" 
+href="http://cg.alexandra.dk/2009/04/30/simulation-of-congenital-heart-surgery/">
+<link rel="prev" title="Real time finite element modelling using CUDA" 
+href="http://cg.alexandra.dk/2009/08/13/real-time-finite-element-modelling-using-cuda/">
+<link rel="next" title="Dr. Noe" 
+href="http://cg.alexandra.dk/2009/10/22/dr-noe/">
+<meta name="generator" content="WordPress 3.0.1">
+<link rel="canonical" 
+href="http://cg.alexandra.dk/2009/08/14/deforming-geometry-using-radial-basis-functions/">
+<link rel="shortlink" href="http://cg.alexandra.dk/?p=312">
+
+<link rel="stylesheet" 
+href="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/dd-formmailer.css"
+ type="text/css" media="screen">
+
+<script type="text/javascript" src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/date_chooser.js"></script>
+
+<link rel="stylesheet" 
+href="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/wp-syntax.css"
+ type="text/css" media="screen">
+<link rel="stylesheet" 
+href="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/media-library-gallery.css"
+ type="text/css" media="screen"><!-- Vipers Video Quicktags v6.3.0 | http://www.viper007bond.com/wordpress-plugins/vipers-video-quicktags/ -->
+<style type="text/css">
+.vvqbox { display: block; max-width: 100%; visibility: visible !important; margin: 10px auto; } .vvqbox img { max-width: 100%; height: 100%; } .vvqbox object { max-width: 100%; } 
+</style>
+<script type="text/javascript">
+// <![CDATA[
+	var vvqflashvars = {};
+	var vvqparams = { wmode: "opaque", allowfullscreen: "true", allowscriptaccess: "always" };
+	var vvqattributes = {};
+	var vvqexpressinstall = "http://cg.alexandra.dk/wp-content/plugins/vipers-video-quicktags/resources/expressinstall.swf";
+// ]]>
+</script>
+
+<style media="screen" type="text/css">#vvq-312-youtube-1 {visibility:hidden}</style></head><body
+ class="inner">
+ <!-- page wrap -->
+ <div id="page" class="with-sidebar">
+
+  <!-- header -->
+  <div id="header-wrap">
+   <div id="header" class="block-content">
+     <div id="pagetitle">
+
+            <h1 class="logo"><a href="http://cg.alexandra.dk/">Computer 
+Graphics Lab</a></h1>
+      
+      <h4>at the Alexandra Institute</h4>      <div class="clear"></div>
+
+                  <!-- search form -->
+      <div class="search-block">
+        <div class="searchform-wrap">
+          <form method="get" id="searchform" 
+action="http://cg.alexandra.dk/">
+            <fieldset>
+            <input name="s" id="searchbox" class="searchfield" 
+value="Search" onfocus="if(this.value == 'Search') {this.value = '';}" 
+onblur="if (this.value == '') {this.value = 'Search';}" type="text">
+             <input value="Go" class="go" type="submit">
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      <!-- /search form -->
+      
+     </div>
+
+     <!-- main navigation -->
+     <div id="nav-wrap1">
+      <div id="nav-wrap2">
+        <ul id="nav">
+                     <li id="nav-homelink"><a class="fadeThis" 
+href="http://cg.alexandra.dk/" title="Click for Home"><span>Home</span></a></li>
+                   <li class="page_item page-item-2"><a class="fadeThis"
+ href="http://cg.alexandra.dk/about/" title="About"><span>About</span></a></li>
+<li class="page_item page-item-39"><a class="fadeThis" 
+href="http://cg.alexandra.dk/gallery/" title="Gallery"><span>Gallery</span></a></li>
+        </ul>
+      </div>
+     </div>
+     <!-- /main navigation -->
+
+   </div>
+  </div>
+  <!-- /header -->
+
+<!-- main wrappers -->
+<div id="main-wrap1">
+ <div id="main-wrap2">
+
+  <!-- main page block -->
+  <div id="main" class="block-content">
+   <div class="mask-main rightdiv">
+    <div class="mask-left">
+
+     <!-- first column -->
+     <div class="col1">
+      <div id="main-content">
+
+              <div class="navigation">
+          <div class="alignleft">« <a 
+href="http://cg.alexandra.dk/2009/08/13/real-time-finite-element-modelling-using-cuda/"
+ rel="prev">Real time finite element modelling using CUDA</a></div>
+          <div class="alignright"><a 
+href="http://cg.alexandra.dk/2009/10/22/dr-noe/" rel="next">Dr. Noe</a> »</div>
+          <div class="clear"></div>
+        </div>
+
+
+        <!-- post -->
+        <div id="post-312" class="post-312 post type-post hentry 
+category-how-to-and-software tag-deformation tag-free-form-deformation 
+tag-geometry-deformation tag-radial-basis-function 
+tag-source-code-tutorials tag-triangle-mesh tag-tutorial">
+           <h2 class="post-title">Noe’s tutorial on deforming 3D 
+geometry using RBFs</h2>
+              <div class="post-content clearfix">
+    	       <p>&nbsp;In the following&nbsp;I will present a method for 
+deforming three dimensional geometry&nbsp;using a technique relying on <em>radial
+ basis functions</em> (RBFs).&nbsp;These are&nbsp;mathematical functions
+ that take&nbsp;a real number as input argument and return&nbsp;a real 
+number. RBFs can be used for creating a 
+smooth&nbsp;interpolation&nbsp;between values&nbsp;known&nbsp;only at 
+a&nbsp;discrete set of positions. The term <em>radial</em> is used 
+because the input argument given is typically computed as the distance 
+between a fixed position in 3D space and another position&nbsp;at 
+which&nbsp;we would like to evaluate&nbsp;a certain quantity.</p>
+<p>The tutorial&nbsp;will&nbsp;give a short introduction to the linear 
+algebra&nbsp;involved. However the source code contains a working 
+implementation of the technique which may be used as a black box. First 
+an example of what we achieve in the end:</p>
+<span class="vvqbox vvqyoutube" style="width: 425px; height: 344px;"><span
+ style="visibility: visible;" id="vvq-312-youtube-1"><a 
+href="http://www.youtube.com/watch?v=PAe51JZnMVY"><img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/0.jpg"
+ alt="YouTube Preview Image"></a></span></span>
+<p>Source code with Visual Studio 2005 solution can be found <a 
+href="http://www.daimi.au.dk/%7Enoe/Tutorials/RBFTutorial.zip">here</a>.
+ The code should also compile on other platforms.</p>
+<h3>Interpolation by radial basis functions</h3>
+<p>Assume that the value of a scalar valued function <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_71b2fd5719b5305c008928c1c0425c3b.png"
+ class="tex" alt="F : \mathbb{R}^3 \rightarrow \mathbb{R}" 
+align="absmiddle"> is known in <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_69691c7bdcc3ce6d5d8a1361f22d04ac.png"
+ class="tex" alt="M" align="absmiddle"> distinct discrete points <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_b133ce6aa41209b4ad485ffdb8e740df.png"
+ class="tex" alt="\mathbf{x}_i" align="absmiddle">&nbsp; in three 
+dimensional space. Then RBFs provide a means for creating a smooth 
+interpolation function of <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_800618943025315f869e4e1f09471012.png"
+ class="tex" alt="F" align="absmiddle"> in the whole domain of <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_a6bcd1eddcf2923b077bd5e08d5731c6.png"
+ class="tex" alt="\mathbb{R}^3" align="absmiddle">. This function is 
+written as a sum of <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_69691c7bdcc3ce6d5d8a1361f22d04ac.png"
+ class="tex" alt="M" align="absmiddle"> evaluations of a radial basis 
+function <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_785db1c0f7753104c14304d44ed66077.png"
+ class="tex" alt="g(r_i) : \mathbb{R} \rightarrow \mathbb{R}" 
+align="absmiddle"> where <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_af2593b49488f8bc44396795792c2d79.png"
+ class="tex" alt="r_i" align="absmiddle"> is the distance between the 
+point <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_2ad9fef4b5e8834df1638060c776adc0.png"
+ class="tex" alt="\mathbf{x} = (x, y, z)" align="absmiddle"> to be 
+evaluated and <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_b133ce6aa41209b4ad485ffdb8e740df.png"
+ class="tex" alt="\mathbf{x}_i" align="absmiddle">:</p>
+<p></p><center><img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_ebb958bdf6a33a1f7232df2f31fa4a49.png"
+ class="tex" alt="F(\mathbf{x}) = \sum_{i=1}^M a_i g(||\mathbf{x} - 
+\mathbf{x}_i||) + c_0 + c_1 x + c_2 y + c_3 z,\ \ \ \mathbf{x} = (x,y,z)
+ \ \ \ \mathbf{(1)}" align="absmiddle"></center>
+<p>&nbsp;Here <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_2aecb1dc57e87620a373d19b0a889efb.png"
+ class="tex" alt="a_i" align="absmiddle"> are scalar coefficients and 
+the last four terms constitute a first degree polynomial with 
+coefficients <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_179474ed9fdcb4ad56770fe1228e1a75.png"
+ class="tex" alt="c_0" align="absmiddle"> to <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_20b620923ab918a6f2b7a0eb419f8fc4.png"
+ class="tex" alt="c_3" align="absmiddle">. These terms&nbsp;describe an 
+affine transformation which cannot be realised by the radial basis 
+functions alone. From the <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_69691c7bdcc3ce6d5d8a1361f22d04ac.png"
+ class="tex" alt="M" align="absmiddle"> known function values <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_947878b94966f364e43a164de4412a0b.png"
+ class="tex" alt="F( x_i, y_i, z_i ) = F_i" align="absmiddle"> we can 
+assemble a system of <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_bb259d1b4601031470814182c30b7db0.png"
+ class="tex" alt="M+4" align="absmiddle"> linear equations:&nbsp;&nbsp;<img
+ 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_ad4016ffae342ac687e7e09ab1d83fb6.png"
+ class="tex" alt="\mathbf{G} \mathbf{A} = \mathbf{F}" align="absmiddle"><br>
+&nbsp;where <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_b5c7f9c150e8f275e76be860f15ab2ca.png"
+ class="tex" alt="\mathbf{F} = (F_1, F_2, \ldots, F_M, 0, 0, 0, 0)" 
+align="absmiddle">, <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_96f613343895fc63e7ccaec164774f48.png"
+ class="tex" alt="\mathbf{A} = (a_1, a_2, \ldots, a_M, c_0, c_1, c_2, 
+c_3)" align="absmiddle"> and <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_527acb137a08b95c9f663e8d60297de7.png"
+ class="tex" alt="\mathbf{G}" align="absmiddle"> is an <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_1a56ac6d7b1077f2b1ff7cb7c1b0048a.png"
+ class="tex" alt="(M+4) \times (M+4)" align="absmiddle"> matrix :</p>
+<p></p><center><img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_34df6d0ec0b18f0aca2f843690731d5e.png"
+ class="tex" alt=" \mathbf{G} = \left[&lt;br /&gt;
+\begin{array}{cccccccccc}&lt;br /&gt;
+g_{11} &amp; g_{12} &amp; \bullet &amp; \bullet &amp; \bullet &amp; 
+g_{1M} &amp; 1 &amp; x_1 &amp; y_1 &amp; z_1\\&lt;br /&gt;
+g_{21} &amp; g_{22} &amp; \bullet &amp; \bullet &amp; \bullet &amp; 
+g_{2M} &amp; 1 &amp; x_2 &amp; y_2 &amp; z_2\\&lt;br /&gt;
+\bullet &amp; \bullet &amp; \bullet &amp; \bullet &amp; \bullet &amp; 
+\bullet &amp; \bullet &amp; \bullet &amp; \bullet &amp; \bullet\\&lt;br 
+/&gt;
+\bullet &amp; \bullet &amp; \bullet &amp; \bullet &amp; \bullet &amp; 
+\bullet &amp; \bullet &amp; \bullet &amp; \bullet &amp; \bullet\\&lt;br 
+/&gt;
+\bullet &amp; \bullet &amp; \bullet &amp; \bullet &amp; \bullet &amp; 
+\bullet &amp; \bullet &amp; \bullet &amp; \bullet &amp; \bullet\\&lt;br 
+/&gt;
+g_{M1} &amp; g_{M2} &amp; \bullet &amp; \bullet &amp; \bullet &amp; 
+g_{MM} &amp; 1 &amp; x_M &amp; y_M &amp; z_M\\&lt;br /&gt;
+1 &amp; 1 &amp; \bullet &amp; \bullet &amp; \bullet &amp; 1 &amp; 0 
+&amp; 0 &amp; 0 &amp; 0\\&lt;br /&gt;
+x_1 &amp; x_2 &amp; \bullet &amp; \bullet &amp; \bullet &amp; x_M &amp; 0
+ &amp; 0 &amp; 0 &amp; 0\\&lt;br /&gt;
+y_1 &amp; y_2 &amp; \bullet &amp; \bullet &amp; \bullet &amp; y_M &amp; 0
+ &amp; 0 &amp; 0 &amp; 0\\&lt;br /&gt;
+z_1 &amp; z_2 &amp; \bullet &amp; \bullet &amp; \bullet &amp; z_M &amp; 0
+ &amp; 0 &amp; 0 &amp; 0&lt;br /&gt;
+\end{array}&lt;br /&gt;
+\right] " align="absmiddle"></center>
+<p>&nbsp;Here <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_680c6bac219a05dbad0171868d3c9a62.png"
+ class="tex" alt="g_{ij} = g(|| \mathbf{x}_i - \mathbf{x}_j ||)" 
+align="absmiddle">. A number of choices for <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_b2f5ff47436671b6e533d8dc3614845d.png"
+ class="tex" alt="g" align="absmiddle"> will result in a unique solution
+ of the system. In this tutorial we use the <em>shifted log function</em>:</p>
+<p></p><center><img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_071582e1be643803f70567e4513ea03f.png"
+ class="tex" alt=" g(t) = \sqrt{log(t^2 + k^2)}, \ \ \ k^2\geq 1" 
+align="absmiddle"></center><br>
+&nbsp;with <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_5c6f937eacd3732196734c56ec527fa4.png"
+ class="tex" alt="k = 1" align="absmiddle">. 
+Solving&nbsp;the&nbsp;equation system&nbsp;for <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_6c6404adc033dfed51422fdaf7fa0494.png"
+ class="tex" alt="\mathbf{A}" align="absmiddle"> gives us the 
+coefficients to use&nbsp; in equation <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_83bd6b85538b0bd07eaeb4744892200d.png"
+ class="tex" alt="\textbf{(1)}" align="absmiddle"> when interpolating 
+between known values.
+<p>&nbsp;</p>
+<h3>Interpolating displacements</h3>
+<p>How can RBF’s be used for deforming geometry? Well assume that the 
+deformation is known for&nbsp;<img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_69691c7bdcc3ce6d5d8a1361f22d04ac.png"
+ class="tex" alt="M" align="absmiddle"> 3D positions&nbsp;<img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_b133ce6aa41209b4ad485ffdb8e740df.png"
+ class="tex" alt="\mathbf{x}_i" align="absmiddle"> and that this 
+information is&nbsp;represented&nbsp;by a vector describing&nbsp;3D 
+displacement <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_702c7ec36a2e8896018332ba9b37e8cb.png"
+ class="tex" alt="\mathbf{u}_i" align="absmiddle"> of&nbsp;the 
+geometry&nbsp;that was positioned at <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_b133ce6aa41209b4ad485ffdb8e740df.png"
+ class="tex" alt="\mathbf{x}_i" align="absmiddle"> in the original, 
+undeformed state. You can think of the <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_b133ce6aa41209b4ad485ffdb8e740df.png"
+ class="tex" alt="\mathbf{x}_i" align="absmiddle"> positions 
+as&nbsp;control points that have been moved to positions <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_850375fbdc1174b406cb18a5815f3f0f.png"
+ class="tex" alt="\mathbf{x}_i+\mathbf{u}_i" align="absmiddle">. The RBF
+ interpolation method can now be used for interpolating 
+these&nbsp;displacements to other&nbsp;positions.&nbsp;</p>
+<p>Using the&nbsp;notation&nbsp;<img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_ee1d30e68b4e7e1d2db0dbcb1e93e776.png"
+ class="tex" alt="\mathbf{x}_i = (x_i, y_i, z_i)" align="absmiddle">&nbsp;and
+ <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_d3f2668f3a822020e1a4b02d26be0129.png"
+ class="tex" alt="\mathbf{u}_i = (u^x_i, u^y_i, u^z_i)" 
+align="absmiddle">&nbsp; three&nbsp;linear systems are set up as above 
+letting the displacements <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_7b774effe4a349c6dd82ad4f4f21d34c.png"
+ class="tex" alt="u" align="absmiddle"> be the quantity we called <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_0cc175b9c0f1b6a831c399e269772661.png"
+ class="tex" alt="a" align="absmiddle"> in the previous section:</p>
+<p></p><center><img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_d53a760733e34053172725a94db72448.png"
+ class="tex" alt="\mathbf{G} \mathbf{A}_x = (u^x_1, u^x_2, \ldots, 
+u^x_M, 0, 0, 0, 0)^T" align="absmiddle"></center><br>
+<center><img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_5c3b1dd1c65ba0ff925e4da007824f06.png"
+ class="tex" alt="\mathbf{G} \mathbf{A}_y = (u^y_1, u^y_2, \ldots, 
+u^y_M, 0, 0, 0, 0)^T" align="absmiddle"></center><br>
+<center><img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_58bdfded8e653f8c6119b5e09bb6f7e3.png"
+ class="tex" alt="\mathbf{G} \mathbf{A}_z = (u^z_1, u^z_2, \ldots, 
+u^z_M, 0, 0, 0, 0)^T" align="absmiddle"></center>
+<p>where <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_527acb137a08b95c9f663e8d60297de7.png"
+ class="tex" alt="\mathbf{G}" align="absmiddle"> is assembled as 
+described above. Solving for <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_690770ec743d4b37ceb07623a9009b1a.png"
+ class="tex" alt="\mathbf{A}_x" align="absmiddle">, <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_c4c1bda987324a72e961b4d5cb5a2507.png"
+ class="tex" alt="\mathbf{A}_y" align="absmiddle">, and <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_41c2f9895a4e2e18e6318ed4e64389d4.png"
+ class="tex" alt="\mathbf{A}_z" align="absmiddle"> involves a single 
+matrix inversion and three matrix-vector multiplications and gives us 
+the coefficients for interpolating displacements in all three directions
+ by the expression <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_3d42d78cc25f0f0ba2b52ac17801d535.png"
+ class="tex" alt="\mathbf{(1)}" align="absmiddle"></p>
+<p>&nbsp;</p>
+<h3>The source code</h3>
+<p>In the source code accompanying this tutorial you will find the class
+ RBFInterpolator which has an interface like this:</p>
+
+<div class="wp_syntax"><div class="code"><pre class="cpp" style="font-family: monospace;"><span style="color: rgb(0, 0, 255);">class</span> RBFInterpolator
+<span style="color: rgb(0, 128, 0);">{</span>
+<span style="color: rgb(0, 0, 255);">public</span><span style="color: rgb(0, 128, 128);">:</span>
+	RBFInterpolator<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+	~RBFInterpolator<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+&nbsp;
+	<span style="color: rgb(102, 102, 102);">//create an interpolation function f that obeys F_i = f(x_i, y_i, z_i)</span>
+	RBFInterpolator<span style="color: rgb(0, 128, 0);">(</span>vector x, vector y, vector z, vector F<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+&nbsp;
+	<span style="color: rgb(102, 102, 102);">//specify new function values F_i while keeping the same</span>
+	<span style="color: rgb(0, 0, 255);">void</span> UpdateFunctionValues<span style="color: rgb(0, 128, 0);">(</span>vector F<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+&nbsp;
+	<span style="color: rgb(102, 102, 102);">//evaluate the interpolation function f at the 3D position (x,y,z)</span>
+	real interpolate<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">float</span> x, <span style="color: rgb(0, 0, 255);">float</span> y, <span style="color: rgb(0, 0, 255);">float</span> z<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+&nbsp;
+<span style="color: rgb(0, 0, 255);">private</span><span style="color: rgb(0, 128, 128);">:</span>
+            ...
+<span style="color: rgb(0, 128, 0);">}</span><span style="color: rgb(0, 128, 128);">;</span></pre></div></div>
+
+<p>This class implements the interpolation method described above using 
+the <a href="http://www.robertnz.net/nm_intro.htm">newmat matrix library</a>.
+ It is quite easy to use: just fill stl::vectors with the <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_1ba8aaab47179b3d3e24b0ccea9f4e30.png"
+ class="tex" alt="x_i" align="absmiddle">, <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_8d62e469fb30ed435a668eb5c035b1f6.png"
+ class="tex" alt="y_i" align="absmiddle"> and <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_5a5ae0760dc3dac91e546c0ea25586b0.png"
+ class="tex" alt="z_i" align="absmiddle"> components of the positions 
+where the value <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_800618943025315f869e4e1f09471012.png"
+ class="tex" alt="F" align="absmiddle"> is known and another stl::vector
+ with the <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_65d8a7a479560f4cef7438864cbfd20e.png"
+ class="tex" alt="F_i" align="absmiddle"> values. Then pass these 
+vectors to the RBFInterpolator constructor, and it will be ready to 
+interpolate. The <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_800618943025315f869e4e1f09471012.png"
+ class="tex" alt="F" align="absmiddle"> value at any position is then 
+evaluated by calling the ‘interpolate’ function. If some of the <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/tex_65d8a7a479560f4cef7438864cbfd20e.png"
+ class="tex" alt="F_i" align="absmiddle"> values change at any time, the
+ interpolator can be quickly updated using the ‘UpdateFunctionValues’ 
+method.</p>
+<p>We want to deform a triangle surface mesh. These are stored in a 
+class TriangleMesh, and loaded from OBJ files.<br>
+In the source code the allocation of stl::vectors discribing the control
+ points and the initialisation of RBFInterpolators looks like this:</p>
+
+<div class="wp_syntax"><div class="code"><pre class="cpp" style="font-family: monospace;"><span style="color: rgb(0, 0, 255);">void</span> loadMeshAndSetupControlPoints<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span>
+<span style="color: rgb(0, 128, 0);">{</span>
+	<span style="color: rgb(102, 102, 102);">// open an OBJ file to deform</span>
+	string sourceOBJ <span style="color: rgb(0, 0, 128);">=</span> <span style="color: rgb(255, 0, 0);">"test_dragon.obj"</span><span style="color: rgb(0, 128, 128);">;</span>
+	undeformedMesh <span style="color: rgb(0, 0, 128);">=</span> <span style="color: rgb(0, 0, 221);">new</span> TriangleMesh<span style="color: rgb(0, 128, 0);">(</span>sourceOBJ<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+	deformedMesh <span style="color: rgb(0, 0, 128);">=</span> <span style="color: rgb(0, 0, 221);">new</span> TriangleMesh<span style="color: rgb(0, 128, 0);">(</span>sourceOBJ<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+&nbsp;
+	<span style="color: rgb(102, 102, 102);">// we want 11 control points which we place at different vertex positions</span>
+	<span style="color: rgb(0, 0, 255);">const</span> <span style="color: rgb(0, 0, 255);">int</span> numControlPoints <span style="color: rgb(0, 0, 128);">=</span> <span style="color: rgb(0, 0, 221);">11</span><span style="color: rgb(0, 128, 128);">;</span>
+&nbsp;
+	<span style="color: rgb(0, 0, 255);">const</span> <span style="color: rgb(0, 0, 255);">int</span> verticesPerControlPoint <span style="color: rgb(0, 0, 128);">=</span> <span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">int</span><span style="color: rgb(0, 128, 0);">)</span>undeformedMesh<span style="color: rgb(0, 0, 64);">-</span><span style="color: rgb(0, 0, 128);">&gt;</span>getParticles<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span>.<span style="color: rgb(0, 119, 136);">size</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 0, 64);">/</span>numControlPoints<span style="color: rgb(0, 128, 128);">;</span>
+&nbsp;
+	<span style="color: rgb(0, 0, 255);">for</span> <span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">int</span> i <span style="color: rgb(0, 0, 128);">=</span> <span style="color: rgb(0, 0, 221);">0</span><span style="color: rgb(0, 128, 128);">;</span> i<span style="color: rgb(0, 0, 128);">&lt;</span>numControlPoints<span style="color: rgb(0, 128, 128);">;</span> i<span style="color: rgb(0, 0, 64);">++</span><span style="color: rgb(0, 128, 0);">)</span>
+	<span style="color: rgb(0, 128, 0);">{</span>
+		Vector3 pos <span style="color: rgb(0, 0, 128);">=</span> undeformedMesh<span style="color: rgb(0, 0, 64);">-</span><span style="color: rgb(0, 0, 128);">&gt;</span>getParticles<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 0);">[</span>i<span style="color: rgb(0, 0, 64);">*</span>verticesPerControlPoint<span style="color: rgb(0, 128, 0);">]</span>.<span style="color: rgb(0, 119, 136);">getPos</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+		controlPointPosX.<span style="color: rgb(0, 119, 136);">push_back</span><span style="color: rgb(0, 128, 0);">(</span>pos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">0</span><span style="color: rgb(0, 128, 0);">]</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+		controlPointPosY.<span style="color: rgb(0, 119, 136);">push_back</span><span style="color: rgb(0, 128, 0);">(</span>pos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">1</span><span style="color: rgb(0, 128, 0);">]</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+		controlPointPosZ.<span style="color: rgb(0, 119, 136);">push_back</span><span style="color: rgb(0, 128, 0);">(</span>pos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">2</span><span style="color: rgb(0, 128, 0);">]</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+	<span style="color: rgb(0, 128, 0);">}</span>
+&nbsp;
+	<span style="color: rgb(102, 102, 102);">// allocate vectors for storing displacements</span>
+	<span style="color: rgb(0, 0, 255);">for</span> <span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">unsigned</span> <span style="color: rgb(0, 0, 255);">int</span> i <span style="color: rgb(0, 0, 128);">=</span> <span style="color: rgb(0, 0, 221);">0</span><span style="color: rgb(0, 128, 128);">;</span> i<span style="color: rgb(0, 0, 128);">&lt;</span>controlPointPosX.<span style="color: rgb(0, 119, 136);">size</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>  i<span style="color: rgb(0, 0, 64);">++</span><span style="color: rgb(0, 128, 0);">)</span>
+	<span style="color: rgb(0, 128, 0);">{</span>
+		controlPointDisplacementX.<span style="color: rgb(0, 119, 136);">push_back</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(128, 0, 128);">0.0f</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+		controlPointDisplacementY.<span style="color: rgb(0, 119, 136);">push_back</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(128, 0, 128);">0.0f</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+		controlPointDisplacementZ.<span style="color: rgb(0, 119, 136);">push_back</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(128, 0, 128);">0.0f</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+	<span style="color: rgb(0, 128, 0);">}</span>
+&nbsp;
+	<span style="color: rgb(102, 102, 102);">// initialize interpolation functions</span>
+	rbfX <span style="color: rgb(0, 0, 128);">=</span> RBFInterpolator<span style="color: rgb(0, 128, 0);">(</span>controlPointPosX, controlPointPosY, 
+                                           controlPointPosZ, controlPointDisplacementX <span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+	rbfY <span style="color: rgb(0, 0, 128);">=</span> RBFInterpolator<span style="color: rgb(0, 128, 0);">(</span>controlPointPosX, controlPointPosY, 
+                                           controlPointPosZ, controlPointDisplacementY <span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+	rbfZ <span style="color: rgb(0, 0, 128);">=</span> RBFInterpolator<span style="color: rgb(0, 128, 0);">(</span>controlPointPosX, controlPointPosY, 
+                                           controlPointPosZ, controlPointDisplacementZ <span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+<span style="color: rgb(0, 128, 0);">}</span></pre></div></div>
+
+<p>Now all displacements are set to zero vectors – not terribly 
+exciting! To make it a bit more fun we can vary the displacements with 
+time:</p>
+
+<div class="wp_syntax"><div class="code"><pre class="cpp" style="font-family: monospace;">	<span style="color: rgb(102, 102, 102);">// move control points</span>
+	<span style="color: rgb(0, 0, 255);">for</span> <span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">unsigned</span> <span style="color: rgb(0, 0, 255);">int</span> i <span style="color: rgb(0, 0, 128);">=</span> <span style="color: rgb(0, 0, 221);">0</span><span style="color: rgb(0, 128, 128);">;</span> i<span style="color: rgb(0, 0, 128);">&lt;</span>controlPointPosX.<span style="color: rgb(0, 119, 136);">size</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span> i<span style="color: rgb(0, 0, 64);">++</span> <span style="color: rgb(0, 128, 0);">)</span>
+	<span style="color: rgb(0, 128, 0);">{</span>
+		controlPointDisplacementX<span style="color: rgb(0, 128, 0);">[</span>i<span style="color: rgb(0, 128, 0);">]</span> <span style="color: rgb(0, 0, 128);">=</span> displacementMagnitude<span style="color: rgb(0, 0, 64);">*</span>cosf<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 0, 221);">time</span><span style="color: rgb(0, 0, 64);">+</span>i<span style="color: rgb(0, 0, 64);">*</span>timeOffset<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+		controlPointDisplacementY<span style="color: rgb(0, 128, 0);">[</span>i<span style="color: rgb(0, 128, 0);">]</span> <span style="color: rgb(0, 0, 128);">=</span> displacementMagnitude<span style="color: rgb(0, 0, 64);">*</span>sinf<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(128, 0, 128);">2.0f</span><span style="color: rgb(0, 0, 64);">*</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 0, 221);">time</span><span style="color: rgb(0, 0, 64);">+</span>i<span style="color: rgb(0, 0, 64);">*</span>timeOffset<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+		controlPointDisplacementZ<span style="color: rgb(0, 128, 0);">[</span>i<span style="color: rgb(0, 128, 0);">]</span> <span style="color: rgb(0, 0, 128);">=</span> displacementMagnitude<span style="color: rgb(0, 0, 64);">*</span>sinf<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(128, 0, 128);">4.0f</span><span style="color: rgb(0, 0, 64);">*</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 0, 221);">time</span><span style="color: rgb(0, 0, 64);">+</span>i<span style="color: rgb(0, 0, 64);">*</span>timeOffset<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+	<span style="color: rgb(0, 128, 0);">}</span>
+&nbsp;
+	<span style="color: rgb(102, 102, 102);">// update the control points based on the new control point positions</span>
+	rbfX.<span style="color: rgb(0, 119, 136);">UpdateFunctionValues</span><span style="color: rgb(0, 128, 0);">(</span>controlPointDisplacementX<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+	rbfY.<span style="color: rgb(0, 119, 136);">UpdateFunctionValues</span><span style="color: rgb(0, 128, 0);">(</span>controlPointDisplacementY<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+	rbfZ.<span style="color: rgb(0, 119, 136);">UpdateFunctionValues</span><span style="color: rgb(0, 128, 0);">(</span>controlPointDisplacementZ<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+&nbsp;
+	<span style="color: rgb(102, 102, 102);">// deform the object to render</span>
+	deformObject<span style="color: rgb(0, 128, 0);">(</span>deformedMesh, undeformedMesh<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span></pre></div></div>
+
+<p>Here the function ‘deformObject’ looks like this:</p>
+
+<div class="wp_syntax"><div class="code"><pre class="cpp" style="font-family: monospace;"><span style="color: rgb(102, 102, 102);">// Code for deforming the mesh 'initialObject' based on the current interpolation functions (global variables). </span>
+<span style="color: rgb(102, 102, 102);">// The deformed vertex positions will be stored in the mesh 'res'</span>
+<span style="color: rgb(102, 102, 102);">// The triangle connectivity is assumed to be already correct in 'res'  </span>
+<span style="color: rgb(0, 0, 255);">void</span> deformObject<span style="color: rgb(0, 128, 0);">(</span>TriangleMesh<span style="color: rgb(0, 0, 64);">*</span> res, TriangleMesh<span style="color: rgb(0, 0, 64);">*</span> initialObject<span style="color: rgb(0, 128, 0);">)</span>
+<span style="color: rgb(0, 128, 0);">{</span>
+	<span style="color: rgb(0, 0, 255);">for</span> <span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">unsigned</span> <span style="color: rgb(0, 0, 255);">int</span> i <span style="color: rgb(0, 0, 128);">=</span> <span style="color: rgb(0, 0, 221);">0</span><span style="color: rgb(0, 128, 128);">;</span> i <span style="color: rgb(0, 0, 128);">&lt;</span> res<span style="color: rgb(0, 0, 64);">-</span><span style="color: rgb(0, 0, 128);">&gt;</span>getParticles<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span>.<span style="color: rgb(0, 119, 136);">size</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span> i<span style="color: rgb(0, 0, 64);">++</span><span style="color: rgb(0, 128, 0);">)</span>
+	<span style="color: rgb(0, 128, 0);">{</span>
+		Vector3 oldpos <span style="color: rgb(0, 0, 128);">=</span> initialObject<span style="color: rgb(0, 0, 64);">-</span><span style="color: rgb(0, 0, 128);">&gt;</span>getParticles<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 0);">[</span>i<span style="color: rgb(0, 128, 0);">]</span>.<span style="color: rgb(0, 119, 136);">getPos</span><span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+&nbsp;
+		Vector3 newpos<span style="color: rgb(0, 128, 128);">;</span>
+		newpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">0</span><span style="color: rgb(0, 128, 0);">]</span> <span style="color: rgb(0, 0, 128);">=</span> oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">0</span><span style="color: rgb(0, 128, 0);">]</span> <span style="color: rgb(0, 0, 64);">+</span> rbfX.<span style="color: rgb(0, 119, 136);">interpolate</span><span style="color: rgb(0, 128, 0);">(</span>oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">0</span><span style="color: rgb(0, 128, 0);">]</span>, oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">1</span><span style="color: rgb(0, 128, 0);">]</span>, oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">2</span><span style="color: rgb(0, 128, 0);">]</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+		newpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">1</span><span style="color: rgb(0, 128, 0);">]</span> <span style="color: rgb(0, 0, 128);">=</span> oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">1</span><span style="color: rgb(0, 128, 0);">]</span> <span style="color: rgb(0, 0, 64);">+</span> rbfY.<span style="color: rgb(0, 119, 136);">interpolate</span><span style="color: rgb(0, 128, 0);">(</span>oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">0</span><span style="color: rgb(0, 128, 0);">]</span>, oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">1</span><span style="color: rgb(0, 128, 0);">]</span>, oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">2</span><span style="color: rgb(0, 128, 0);">]</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+		newpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">2</span><span style="color: rgb(0, 128, 0);">]</span> <span style="color: rgb(0, 0, 128);">=</span> oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">2</span><span style="color: rgb(0, 128, 0);">]</span> <span style="color: rgb(0, 0, 64);">+</span> rbfZ.<span style="color: rgb(0, 119, 136);">interpolate</span><span style="color: rgb(0, 128, 0);">(</span>oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">0</span><span style="color: rgb(0, 128, 0);">]</span>, oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">1</span><span style="color: rgb(0, 128, 0);">]</span>, oldpos<span style="color: rgb(0, 128, 0);">[</span><span style="color: rgb(0, 0, 221);">2</span><span style="color: rgb(0, 128, 0);">]</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+&nbsp;
+		res<span style="color: rgb(0, 0, 64);">-</span><span style="color: rgb(0, 0, 128);">&gt;</span>getParticles<span style="color: rgb(0, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 0);">[</span>i<span style="color: rgb(0, 128, 0);">]</span>.<span style="color: rgb(0, 119, 136);">setPos</span><span style="color: rgb(0, 128, 0);">(</span>newpos<span style="color: rgb(0, 128, 0);">)</span><span style="color: rgb(0, 128, 128);">;</span>
+	<span style="color: rgb(0, 128, 0);">}</span>
+<span style="color: rgb(0, 128, 0);">}</span></pre></div></div>
+
+<p>That’s it!!! Now I encourage you to download the <a 
+href="http://www.daimi.au.dk/%7Enoe/Tutorials/RBFTutorial.zip">source 
+code</a> and play with it. Perhaps you can experiment with other radial 
+basis functions? Or make the dragon crawl like a caterpillar? If you 
+code something interesting based on this tutorial send a link to me and 
+we will link to it from this page <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/icon_smile.gif"
+ alt=":-)" class="wp-smiley"> </p>
+<p><a href="mailto:karsten.noe%7Bat%7Dalexandra.dk">Karsten Noe</a></p>
+<p>I got a mail from Woo Won Kim from Yonsei University in South Korea 
+who has made a head modeling program that can generate 3D human heads 
+from two pictures of the person using code from this RBF tutorial. Check
+ out a video of this <a 
+href="http://www.youtube.com/watch?v=RdsKzhtXaIw">here</a>.</p>
+
+<script type="text/javascript">
+	swfobject.embedSWF("http://www.youtube.com/v/PAe51JZnMVY&amp;rel=0&amp;fs=1&amp;showsearch=0&amp;showinfo=0", "vvq-312-youtube-1", "425", "344", "10", vvqexpressinstall, vvqflashvars, vvqparams, vvqattributes);
+</script>
+              </div>
+                                          <p class="tags"> Tags: <a 
+href="http://cg.alexandra.dk/tag/deformation/" rel="tag">deformation</a>,
+ <a href="http://cg.alexandra.dk/tag/free-form-deformation/" rel="tag">free
+ form deformation</a>, <a 
+href="http://cg.alexandra.dk/tag/geometry-deformation/" rel="tag">Geometry
+ deformation</a>, <a 
+href="http://cg.alexandra.dk/tag/radial-basis-function/" rel="tag">radial
+ basis function</a>, <a 
+href="http://cg.alexandra.dk/tag/source-code-tutorials/" rel="tag">Source
+ Code &amp; Tutorials</a>, <a 
+href="http://cg.alexandra.dk/tag/triangle-mesh/" rel="tag">triangle mesh</a>,
+ <a href="http://cg.alexandra.dk/tag/tutorial/" rel="tag">tutorial</a></p>
+              <div class="clear"></div>
+                            <p class="post-metadata">
+                    This entry was posted on August 14, 2009, 3:01 pm 
+and is filed under <a 
+href="http://cg.alexandra.dk/category/how-to-and-software/" title="View 
+all posts in How-To and Software" rel="category tag">How-To and Software</a>.
+ You can follow any responses to this entry through <a 
+href="http://cg.alexandra.dk/2009/08/14/deforming-geometry-using-radial-basis-functions/feed/"
+ title="RSS 2.0">RSS 2.0</a>.
+                    You can <a href="#respond">leave a response</a>, or <a
+ 
+href="http://cg.alexandra.dk/2009/08/14/deforming-geometry-using-radial-basis-functions/trackback/"
+ rel="trackback">trackback</a> from your own site.                      
+  		  </p>
+
+        </div>
+        <!-- /post -->
+  
+    	
+  
+  <h3 class="comments">
+    5 Comments  </h3>
+
+  <!-- comments -->
+  <ul id="comments">
+    
+  <!-- comment entry -->
+  <li class="comment even thread-even depth-1 with-avatar" 
+id="comment-2126">
+   <div class="comment-mask regularcomment">
+    <div class="comment-main">
+     <div class="comment-wrap1">
+      <div class="comment-wrap2">
+       <div class="comment-head tiptrigger">
+        <p>
+          <a class="comment-id" href="#comment-2126">#1</a> by <span 
+class="with-tooltip"><a class="comment-author" id="commentauthor-2126" 
+href="http://none/">Amr</a></span> on February 23, 2010 - 6:05 pm       
+ </p>
+
+                <p class="controls tip">
+                           <a class="quote" title="Quote" 
+href="javascript:void(0);"><span>Quote</span></a> 
+        </p>
+               </div>
+       <div class="comment-body clearfix" id="comment-body-2126">
+                  <div class="avatar"><img alt="" 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/b6c5d3ef3bc43625164cc9c978465855.png"
+ class="avatar avatar-64 photo" height="64" width="64"></div>
+         
+         
+         <div class="comment-text"><p>thanx for this tutorial .. iam 
+coding a physics engine for games on Xbox so iam using c# xna as my 
+language .. i have problem converting your code to C# wise <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/icon_sad.gif"
+ alt=":(" class="wp-smiley"><br>
+i appreciate your help by any mean<br>
+thanx <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/icon_smile.gif"
+ alt=":)" class="wp-smiley"> </p>
+</div>
+         <a id="comment-reply-2126"></a>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+</li>
+
+  <!-- comment entry -->
+  <li class="comment odd alt thread-odd thread-alt depth-1 with-avatar" 
+id="comment-2348">
+   <div class="comment-mask regularcomment">
+    <div class="comment-main">
+     <div class="comment-wrap1">
+      <div class="comment-wrap2">
+       <div class="comment-head tiptrigger">
+        <p>
+          <a class="comment-id" href="#comment-2348">#2</a> by <b 
+id="commentauthor-2348">yaoyansi</b> on March 8, 2010 - 10:02 am        </p>
+
+                <p class="controls tip">
+                           <a class="quote" title="Quote" 
+href="javascript:void(0);"><span>Quote</span></a> 
+        </p>
+               </div>
+       <div class="comment-body clearfix" id="comment-body-2348">
+                  <div class="avatar"><img alt="" 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/f72396f3f73b2c0dca38e9dd54d55aa9.png"
+ class="avatar avatar-64 photo" height="64" width="64"></div>
+         
+         
+         <div class="comment-text"><p>Thank you very very much for this 
+source code.</p>
+</div>
+         <a id="comment-reply-2348"></a>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+</li>
+
+  <!-- comment entry -->
+  <li class="comment even thread-even depth-1 with-avatar" 
+id="comment-3700">
+   <div class="comment-mask regularcomment">
+    <div class="comment-main">
+     <div class="comment-wrap1">
+      <div class="comment-wrap2">
+       <div class="comment-head tiptrigger">
+        <p>
+          <a class="comment-id" href="#comment-3700">#3</a> by <b 
+id="commentauthor-3700">Belayouni</b> on July 2, 2010 - 5:22 pm        </p>
+
+                <p class="controls tip">
+                           <a class="quote" title="Quote" 
+href="javascript:void(0);"><span>Quote</span></a> 
+        </p>
+               </div>
+       <div class="comment-body clearfix" id="comment-body-3700">
+                  <div class="avatar"><img alt="" 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/f8f3efd6b917d74f0a14a6cb839b6d1c.png"
+ class="avatar avatar-64 photo" height="64" width="64"></div>
+         
+         
+         <div class="comment-text"><p>Thanks for this simple and well 
+explained tutorial.<br>
+Actually I’m trying to apply this algorithm to deform a small Cartesian 
+grid on MatLab. But since the gii terms of the radial function are zeros
+ and the G matrix is not invertible (det(G)=0) because 
+sqrt(log(0+k^2))=0 k=1).<br>
+I wanted to know how did you deal with this? <img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/icon_smile.gif"
+ alt=":)" class="wp-smiley"> </p>
+</div>
+         <a id="comment-reply-3700"></a>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+</li>
+
+  <!-- comment entry -->
+  <li class="comment odd alt thread-odd thread-alt depth-1 with-avatar" 
+id="comment-3909">
+   <div class="comment-mask regularcomment">
+    <div class="comment-main">
+     <div class="comment-wrap1">
+      <div class="comment-wrap2">
+       <div class="comment-head tiptrigger">
+        <p>
+          <a class="comment-id" href="#comment-3909">#4</a> by <b 
+id="commentauthor-3909">Minh Nguyen</b> on September 14, 2010 - 5:40 pm 
+       </p>
+
+                <p class="controls tip">
+                           <a class="quote" title="Quote" 
+href="javascript:void(0);"><span>Quote</span></a> 
+        </p>
+               </div>
+       <div class="comment-body clearfix" id="comment-body-3909">
+                  <div class="avatar"><img alt="" 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/940b4583db71f1c85c5cf5e70fab16f9.png"
+ class="avatar avatar-64 photo" height="64" width="64"></div>
+         
+         
+         <div class="comment-text"><p>The code is very interesting. 
+However, I doubt that this is practical for relatively large models 
+(wouldn’t say too big) with 100Ks of vertices. Because your matrix G is a
+ dense matrix, most computers won’t even have enough memory to allocate 
+100k x 100k x sizeof(float) just for the matrix G itself.</p>
+</div>
+         <a id="comment-reply-3909"></a>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+</li>
+
+  <!-- comment entry -->
+  <li class="comment byuser comment-author-admin bypostauthor even 
+thread-even depth-1 with-avatar" id="comment-4134">
+   <div class="comment-mask admincomment">
+    <div class="comment-main">
+     <div class="comment-wrap1">
+      <div class="comment-wrap2">
+       <div class="comment-head tiptrigger">
+        <p>
+          <a class="comment-id" href="#comment-4134">#5</a> by <b 
+id="commentauthor-4134">admin</b> on October 29, 2010 - 1:32 pm        </p>
+
+                <p class="controls tip">
+                           <a class="quote" title="Quote" 
+href="javascript:void(0);"><span>Quote</span></a> 
+        </p>
+               </div>
+       <div class="comment-body clearfix" id="comment-body-4134">
+                  <div class="avatar"><img alt="" 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/f62c5a6b00c0b21a662523114f11f979.png"
+ class="avatar avatar-64 photo" height="64" width="64"></div>
+         
+         
+         <div class="comment-text"><p>Minh Nguyen: The size of the 
+matrix depends on the number of control points and not the number of 
+vertices to displace. So if you think of the control points you are 
+right, but not if you are thinking about the vertices in the model to 
+deform.</p>
+</div>
+         <a id="comment-reply-4134"></a>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+</li>
+   </ul>
+   <div class="clear"></div>
+   
+   
+   
+      <div id="respond">
+      <script type="text/javascript">
+       function validatecomment(form){
+         if(form.author.value == ('' || 'Your name (required)')){
+           alert('Please enter your name');
+           return false;
+         }
+         if(form.email.value == ('' || 'Your e-mail (required, will not be published)')){
+           alert('Please enter your email address');
+           return false;
+         }
+         if(form.comment.value == ('' || 'Type your comment here')){
+           alert('Please type a comment');
+           return false;
+         }
+         if(form.url.value == ('' || 'Your website')){
+           form.url.value = '';
+           return true;
+         }
+       }
+      </script>
+      <form action="http://cg.alexandra.dk/wp-comments-post.php" 
+method="post" id="commentform" onsubmit="return validatecomment(this);">
+        <div class="cancel-comment-reply"><a rel="nofollow" 
+id="cancel-comment-reply-link" 
+href="http://cg.alexandra.dk/2009/08/14/deforming-geometry-using-radial-basis-functions/#respond"
+ style="display: none;">Cancel Reply</a></div>          	               
+ <div id="author_info">
+            <div class="row">
+              <input name="author" id="author" class="textfield 
+required" size="34" tabindex="1" value="Your name (required)" 
+onfocus="if( this.value == 'Your name (required)') {this.value = '';}" 
+onblur="if (this.value == '') { this.value = 'Your name (required)';}" 
+type="text">
+            </div>
+            <div class="row">
+              <input name="email" id="email" class="textfield required" 
+value="Your e-mail (required, will not be published)" 
+onfocus="if(this.value == 'Your e-mail (required, will not be 
+published)') { this.value = '';}" onblur="if (this.value == '') { 
+this.value = 'Your e-mail (required, will not be published)';}" 
+size="60" tabindex="2" type="text">
+            </div>
+            <div class="row">
+              <input name="url" id="url" class="textfield" value="Your 
+website" onfocus="if(this.value == 'Your website') { this.value = 
+'http://';}" onblur="if ((this.value == 'http://') || (this.value == 
+'')) { this.value = 'Your website';}" size="60" tabindex="3" type="text">
+            </div>
+
+  		  </div>
+                  
+        <!-- comment input -->
+        <div class="row">
+        	<textarea name="comment" id="comment" class="required" 
+tabindex="4" rows="8" cols="60" onfocus="if(this.value == 'Type your 
+comment here') {this.value = '';}" onblur="if(this.value == '') 
+{this.value = 'Type your comment here';}">Type your comment here</textarea>
+        	            
+        	<input name="comment_post_ID" value="312" id="comment_post_ID" 
+type="hidden">
+<input name="comment_parent" id="comment_parent" value="0" type="hidden">
+        </div>
+        <!-- /comment input -->
+
+        <div id="submitbox" class="left">
+		<input name="submit" id="submit" class="button" tabindex="5" 
+value="Submit Comment" type="submit">
+         <input name="formInput" type="hidden">
+                </div>
+      </form>
+
+    </div>
+        
+  <!-- /comments -->
+
+
+            </div>
+     </div>
+     <!-- /first column -->
+     
+<!-- 2nd column (sidebar) -->
+<div class="col2">
+ <ul id="sidebar">
+
+    
+    
+    <li class="block widget widget_text" id="text-3"><div class="box"> <div
+ class="wrapleft"><div class="wrapright"><div class="tr"><div class="bl"><div
+ class="tl"><div class="br the-content"><div class="titlewrap"><h4><span>What
+ we do</span></h4></div>			<div class="textwidget">The Alexandra 
+Institute is a non-profit, private research institute doing R&amp;D and 
+consultancy within IT. The CG Lab specializes in advanced computer 
+graphics and it's application in the business world. </div>
+		</div></div></div></div></div></div> </div></li><li class="block 
+widget widget_categories" id="categories-3"><div class="box"> <div 
+class="wrapleft"><div class="wrapright"><div class="tr"><div class="bl"><div
+ class="tl"><div class="br the-content"><div class="titlewrap"><h4><span>Categories</span></h4></div>
+		<ul>
+	<li class="cat-item cat-item-59"><a 
+href="http://cg.alexandra.dk/category/events/" title="View all posts 
+filed under Events">Events</a> (5)
+</li>
+	<li class="cat-item cat-item-11"><a 
+href="http://cg.alexandra.dk/category/gpgpu/" title="View all posts 
+filed under GPGPU">GPGPU</a> (3)
+</li>
+	<li class="cat-item cat-item-63"><a 
+href="http://cg.alexandra.dk/category/how-to-and-software/" title="View 
+all posts filed under How-To and Software">How-To and Software</a> (10)
+</li>
+	<li class="cat-item cat-item-62"><a 
+href="http://cg.alexandra.dk/category/information-visualisation/" 
+title="View all posts filed under Information Visualisation">Information
+ Visualisation</a> (2)
+</li>
+	<li class="cat-item cat-item-60"><a 
+href="http://cg.alexandra.dk/category/medical-applications/" title="View
+ all posts filed under Medical Applications">Medical Applications</a> 
+(4)
+</li>
+	<li class="cat-item cat-item-8"><a 
+href="http://cg.alexandra.dk/category/people/" title="View all posts 
+filed under People">People</a> (5)
+</li>
+	<li class="cat-item cat-item-61"><a 
+href="http://cg.alexandra.dk/category/realistic-rendering/" title="View 
+all posts filed under Realistic Rendering">Realistic Rendering</a> (16)
+</li>
+	<li class="cat-item cat-item-1"><a 
+href="http://cg.alexandra.dk/category/uncategorized/" title="View all 
+posts filed under Uncategorized">Uncategorized</a> (1)
+</li>
+		</ul>
+</div></div></div></div></div></div> </div></li><li class="block widget 
+widget_tag_cloud" id="tag_cloud-2"><div class="box"> <div 
+class="wrapleft"><div class="wrapright"><div class="tr"><div class="bl"><div
+ class="tl"><div class="br the-content"><div class="titlewrap"><h4><span>Tag
+ Cloud</span></h4></div><div><a 
+href="http://cg.alexandra.dk/tag/ambient-occlusion/" class="tag-link-40"
+ title="1 topic" style="font-size: 8pt;">ambient occlusion</a>
+<a href="http://cg.alexandra.dk/tag/cg/" class="tag-link-19" title="3 
+topics" style="font-size: 14pt;">CG</a>
+<a href="http://cg.alexandra.dk/tag/cloth-simulation/" 
+class="tag-link-35" title="1 topic" style="font-size: 8pt;">cloth 
+simulation</a>
+<a href="http://cg.alexandra.dk/tag/course/" class="tag-link-22" 
+title="1 topic" style="font-size: 8pt;">course</a>
+<a href="http://cg.alexandra.dk/tag/cuda/" class="tag-link-18" title="9 
+topics" style="font-size: 22pt;">cuda</a>
+<a href="http://cg.alexandra.dk/tag/cutting/" class="tag-link-31" 
+title="1 topic" style="font-size: 8pt;">cutting</a>
+<a href="http://cg.alexandra.dk/tag/deformable-models/" 
+class="tag-link-50" title="1 topic" style="font-size: 8pt;">deformable 
+models</a>
+<a href="http://cg.alexandra.dk/tag/deformation/" class="tag-link-13" 
+title="3 topics" style="font-size: 14pt;">deformation</a>
+<a href="http://cg.alexandra.dk/tag/fem/" class="tag-link-48" title="1 
+topic" style="font-size: 8pt;">FEM</a>
+<a href="http://cg.alexandra.dk/tag/finite-element-models/" 
+class="tag-link-49" title="1 topic" style="font-size: 8pt;">finite 
+element models</a>
+<a href="http://cg.alexandra.dk/tag/free-form-deformation/" 
+class="tag-link-46" title="1 topic" style="font-size: 8pt;">free form 
+deformation</a>
+<a href="http://cg.alexandra.dk/tag/geometry-deformation/" 
+class="tag-link-43" title="1 topic" style="font-size: 8pt;">Geometry 
+deformation</a>
+<a href="http://cg.alexandra.dk/tag/gpgpu/" class="tag-link-11" title="8
+ topics" style="font-size: 21pt;">GPGPU</a>
+<a href="http://cg.alexandra.dk/tag/gpu/" class="tag-link-41" title="2 
+topics" style="font-size: 11.6pt;">gpu</a>
+<a href="http://cg.alexandra.dk/tag/hdr/" class="tag-link-67" title="1 
+topic" style="font-size: 8pt;">hdr</a>
+<a href="http://cg.alexandra.dk/tag/ibl/" class="tag-link-68" title="1 
+topic" style="font-size: 8pt;">ibl</a>
+<a href="http://cg.alexandra.dk/tag/job/" class="tag-link-64" title="1 
+topic" style="font-size: 8pt;">job</a>
+<a href="http://cg.alexandra.dk/tag/lego/" class="tag-link-58" title="2 
+topics" style="font-size: 11.6pt;">Lego</a>
+<a href="http://cg.alexandra.dk/tag/materials/" class="tag-link-42" 
+title="2 topics" style="font-size: 11.6pt;">materials</a>
+<a href="http://cg.alexandra.dk/tag/medical/" class="tag-link-28" 
+title="2 topics" style="font-size: 11.6pt;">medical</a>
+<a href="http://cg.alexandra.dk/tag/opencl/" class="tag-link-65" 
+title="1 topic" style="font-size: 8pt;">opencl</a>
+<a href="http://cg.alexandra.dk/tag/opengl/" class="tag-link-20" 
+title="4 topics" style="font-size: 16pt;">OpenGL</a>
+<a href="http://cg.alexandra.dk/tag/particle-system/" 
+class="tag-link-38" title="1 topic" style="font-size: 8pt;">particle 
+system</a>
+<a href="http://cg.alexandra.dk/tag/photonmapping/" class="tag-link-33" 
+title="1 topic" style="font-size: 8pt;">photonmapping</a>
+<a href="http://cg.alexandra.dk/tag/photon-mapping/" class="tag-link-32"
+ title="1 topic" style="font-size: 8pt;">photon mapping</a>
+<a href="http://cg.alexandra.dk/tag/physics-based-animation/" 
+class="tag-link-36" title="1 topic" style="font-size: 8pt;">physics 
+based animation</a>
+<a href="http://cg.alexandra.dk/tag/radial-basis-function/" 
+class="tag-link-45" title="1 topic" style="font-size: 8pt;">radial basis
+ function</a>
+<a href="http://cg.alexandra.dk/tag/ray-casting/" class="tag-link-15" 
+title="2 topics" style="font-size: 11.6pt;">ray casting</a>
+<a href="http://cg.alexandra.dk/tag/ray-marching/" class="tag-link-24" 
+title="2 topics" style="font-size: 11.6pt;">ray marching</a>
+<a href="http://cg.alexandra.dk/tag/ray-tracer/" class="tag-link-39" 
+title="2 topics" style="font-size: 11.6pt;">ray tracer</a>
+<a href="http://cg.alexandra.dk/tag/raytracing/" class="tag-link-66" 
+title="1 topic" style="font-size: 8pt;">raytracing</a>
+<a href="http://cg.alexandra.dk/tag/ray-tracing/" class="tag-link-17" 
+title="6 topics" style="font-size: 19pt;">ray tracing</a>
+<a href="http://cg.alexandra.dk/tag/registration/" class="tag-link-14" 
+title="1 topic" style="font-size: 8pt;">registration</a>
+<a href="http://cg.alexandra.dk/tag/scattering/" class="tag-link-30" 
+title="3 topics" style="font-size: 14pt;">scattering</a>
+<a href="http://cg.alexandra.dk/tag/simulation/" class="tag-link-10" 
+title="4 topics" style="font-size: 16pt;">simulation</a>
+<a href="http://cg.alexandra.dk/tag/smoke/" class="tag-link-29" title="1
+ topic" style="font-size: 8pt;">smoke</a>
+<a href="http://cg.alexandra.dk/tag/source-code-tutorials/" 
+class="tag-link-47" title="1 topic" style="font-size: 8pt;">Source Code 
+&amp; Tutorials</a>
+<a href="http://cg.alexandra.dk/tag/source-code-and-tutorials/" 
+class="tag-link-21" title="2 topics" style="font-size: 11.6pt;">Source 
+Code &amp; Tutorials</a>
+<a href="http://cg.alexandra.dk/tag/spring-mass-system/" 
+class="tag-link-37" title="1 topic" style="font-size: 8pt;">spring mass 
+system</a>
+<a href="http://cg.alexandra.dk/tag/stereo/" class="tag-link-27" 
+title="1 topic" style="font-size: 8pt;">stereo</a>
+<a href="http://cg.alexandra.dk/tag/surgery/" class="tag-link-12" 
+title="3 topics" style="font-size: 14pt;">surgery</a>
+<a href="http://cg.alexandra.dk/tag/triangle-mesh/" class="tag-link-44" 
+title="1 topic" style="font-size: 8pt;">triangle mesh</a>
+<a href="http://cg.alexandra.dk/tag/tutorial/" class="tag-link-23" 
+title="2 topics" style="font-size: 11.6pt;">tutorial</a>
+<a href="http://cg.alexandra.dk/tag/visible-human/" class="tag-link-26" 
+title="1 topic" style="font-size: 8pt;">visible human</a>
+<a href="http://cg.alexandra.dk/tag/volume-rendering/" 
+class="tag-link-16" title="2 topics" style="font-size: 11.6pt;">volume 
+rendering</a></div>
+</div></div></div></div></div></div> </div></li><li class="block widget 
+widget_archive" id="archives-2"><div class="box"> <div class="wrapleft"><div
+ class="wrapright"><div class="tr"><div class="bl"><div class="tl"><div 
+class="br the-content"><div class="titlewrap"><h4><span>Archives</span></h4></div>
+		<ul>
+			<li><a href="http://cg.alexandra.dk/2011/02/" title="February 2011">February
+ 2011</a>&nbsp;(3)</li>
+	<li><a href="http://cg.alexandra.dk/2011/01/" title="January 2011">January
+ 2011</a>&nbsp;(2)</li>
+	<li><a href="http://cg.alexandra.dk/2010/11/" title="November 2010">November
+ 2010</a>&nbsp;(2)</li>
+	<li><a href="http://cg.alexandra.dk/2010/10/" title="October 2010">October
+ 2010</a>&nbsp;(1)</li>
+	<li><a href="http://cg.alexandra.dk/2010/09/" title="September 2010">September
+ 2010</a>&nbsp;(2)</li>
+	<li><a href="http://cg.alexandra.dk/2010/07/" title="July 2010">July 
+2010</a>&nbsp;(3)</li>
+	<li><a href="http://cg.alexandra.dk/2010/06/" title="June 2010">June 
+2010</a>&nbsp;(2)</li>
+	<li><a href="http://cg.alexandra.dk/2010/05/" title="May 2010">May 2010</a>&nbsp;(1)</li>
+	<li><a href="http://cg.alexandra.dk/2010/04/" title="April 2010">April 
+2010</a>&nbsp;(1)</li>
+	<li><a href="http://cg.alexandra.dk/2010/03/" title="March 2010">March 
+2010</a>&nbsp;(2)</li>
+	<li><a href="http://cg.alexandra.dk/2009/12/" title="December 2009">December
+ 2009</a>&nbsp;(3)</li>
+	<li><a href="http://cg.alexandra.dk/2009/11/" title="November 2009">November
+ 2009</a>&nbsp;(1)</li>
+	<li><a href="http://cg.alexandra.dk/2009/10/" title="October 2009">October
+ 2009</a>&nbsp;(1)</li>
+	<li><a href="http://cg.alexandra.dk/2009/08/" title="August 2009">August
+ 2009</a>&nbsp;(3)</li>
+	<li><a href="http://cg.alexandra.dk/2009/07/" title="July 2009">July 
+2009</a>&nbsp;(1)</li>
+	<li><a href="http://cg.alexandra.dk/2009/06/" title="June 2009">June 
+2009</a>&nbsp;(3)</li>
+	<li><a href="http://cg.alexandra.dk/2009/05/" title="May 2009">May 2009</a>&nbsp;(8)</li>
+	<li><a href="http://cg.alexandra.dk/2009/04/" title="April 2009">April 
+2009</a>&nbsp;(3)</li>
+		</ul>
+</div></div></div></div></div></div> </div></li><li class="block widget 
+widget_search" id="gallerywidget-2"><div class="box"> <div 
+class="wrapleft"><div class="wrapright"><div class="tr"><div class="bl"><div
+ class="tl"><div class="br the-content"><div class="titlewrap"><h4><span>Random
+ Images</span></h4></div><ul class="wGallery"><li class="wGallery"><a 
+href="http://cg.alexandra.dk/2009/08/10/triers-cuda-ray-tracing-tutorial/bunnyboy/"><img
+ 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/bunnyboy-150x150.jpg"
+ alt="bunnyboy" title="bunnyboy"></a></li><li class="wGallery"><a 
+href="http://cg.alexandra.dk/capital-globe/screenshot2/"><img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/Screenshot2-150x150.png"
+ alt="Screenshot2" title="Screenshot2"></a></li><li class="wGallery"><a 
+href="http://cg.alexandra.dk/2009/05/01/raytracing-on-the-gpu/gpu_ray_refraction/"><img
+ 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/gpu_ray_refraction-150x150.jpg"
+ alt="CUDA raytracer – refraction and reflection test" title="CUDA 
+raytracer – refraction and reflection test"></a></li><li 
+class="wGallery"><a 
+href="http://cg.alexandra.dk/2009/06/16/4-division/division_4/"><img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/division_4-150x150.jpg"
+ alt="division_4" title="division_4"></a></li><li class="wGallery"><a 
+href="http://cg.alexandra.dk/2011/02/11/unity-custom-particle-system-demo/psvelvertical/"><img
+ 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/PSVelVertical-150x150.jpg"
+ alt="PSVelVertical" title="PSVelVertical"></a></li></ul></div></div></div></div></div></div>
+ </div></li> </ul>
+</div>
+<!-- /2nd column -->
+     
+
+    </div>
+   </div>
+   <div class="clear-content"></div>
+  </div>
+  <!-- /main page block -->
+
+ </div>
+</div>
+<!-- /main wrappers -->
+
+
+ <!-- footer -->
+ <div id="footer">
+
+  <!-- page block -->
+  <div class="block-content">
+
+    
+
+    
+    <div class="copyright">
+     <p>
+     <!-- please do not remove this. respect the authors :) -->
+     Arclite theme by <a href="http://digitalnature.ro/">digitalnature</a>
+ | powered by <a href="http://wordpress.org/">WordPress</a>     </p>
+     <p>
+     <a class="rss" href="http://cg.alexandra.dk/feed/">Entries (RSS)</a>
+ and <a href="http://cg.alexandra.dk/comments/feed/">Comments (RSS)</a> <a
+ href="javascript:void(0);" class="toplink">TOP</a>
+     <!-- 25 queries. 6.066 seconds. -->
+     </p>
+    </div>
+
+  </div>
+  <!-- /page block -->
+
+ </div>
+ <!-- /footer -->
+
+</div>
+<!-- /page -->
+
+  <script type="text/javascript">
+  /* <![CDATA[ */
+    var isIE6 = false; /* <- do not change! */
+    var isIE = false; /* <- do not change! */
+    var lightbox = 0;/* <- do not change! */
+  /* ]]> */
+  </script>
+  <!--[if lte IE 6]> <script type="text/javascript"> isIE6 = true; isIE = true; </script> <![endif]-->
+  <!--[if gte IE 7]> <script type="text/javascript"> isIE = true; </script> <![endif]-->
+
+
+<script type="text/javascript">
+/* <![CDATA[ */
+var thickboxL10n = {
+	next: "Next &gt;",
+	prev: "&lt; Prev",
+	image: "Image",
+	of: "of",
+	close: "Close",
+	noiframes: "This feature requires inline frames. You have iframes disabled or your browser does not support them."
+};
+try{convertEntities(thickboxL10n);}catch(e){};
+/* ]]> */
+</script>
+<script type="text/javascript" src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/thickbox.js"></script>
+	<!-- Start of StatCounter Code -->
+	<script type="text/javascript">
+	<!-- 
+		var sc_project=4706368; 
+		var sc_security="3a108e40"; 
+	//-->
+	</script>
+	<script type="text/javascript" src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/counter_xhtml.js"></script><span
+ class="statcounter"><a class="statcounter" 
+href="http://www.statcounter.com/" target="_blank"><img 
+src="Noe%E2%80%99s%20tutorial%20on%20deforming%203D%20geometry%20using%20RBFs%20%C2%AB%20Computer%20Graphics%20Lab_files/t"
+ alt="StatCounter - Free Web Tracker and Counter" border="0"></a></span>
+
+<noscript><div class="statcounter"><a title="web analytics" href="http://www.statcounter.com/" target="_blank"><img class="statcounter" src="http://c.statcounter.com/4706368/0/3a108e40/0/" alt="web analytics" ></a></div></noscript>
+	
+	<!-- End of StatCounter Code -->
+</body></html>

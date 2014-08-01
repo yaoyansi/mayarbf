@@ -1,0 +1,589 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head id="head">
+
+
+<style type="text/css">
+body {font-family:Arial, Helvetica, sans-serif}
+pre {font-family:"Courier New", courier, monotype}
+h3, h2, h4, h1, ul, ol, div, p, td {font-family:Arial, Helvetica, sans-serif}
+h1, h2 {text-align:center}
+a:link, a:visited {color: #003366}
+a.ext, a.ext:visited {color:#006655}
+a.menu, a.menu:visited { text-decoration:none; color:#003366}
+a.menu:hover { text-decoration:underline}
+a:visited:hover, a.menu:hover, a:link:hover {color: #0033FF}
+#amain, a.noul, a.noul:visited {text-decoration:none}
+a.noul:hover {text-decoration:underline}
+/*
+#amain {padding-bottom:0;padding-top:0}
+.agreen {color:#004400}
+.pl {padding-left:270}
+.mm {text-align:left}
+a.mma {text-decoration:none; color: red}
+a.mma:hover {text-decoration:underline; color: #FF9900}*/
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="description" content="Radial Basis Function FAQ">
+<meta name="keywords" content="Radial Basis Function FAQ RBF">
+<title>Farfield: What are RBFs</title>
+</head><body topmargin="0" bottommargin="0" alink="#006600" 
+bgcolor="white" link="#006600" marginheight="0" vlink="#006600">
+<div id="header">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr height="79"><td colspan="3" align="center">
+<a href="http://www.farfieldtechnology.com/"><img 
+src="rbffaq_files/fft-title.png" align="center" border="0" height="74" 
+width="270"></a>
+</td></tr>
+<tr bgcolor="#eeeef7"><td align="center"><table align="center" 
+border="0" cellpadding="0" cellspacing="0">
+
+<tbody><tr bgcolor="#ccddee"><td><font> &nbsp; <nobr><b> <a class="menu"
+ href="http://www.farfieldtechnology.com/products/">Products</a> </b></nobr><nobr>&nbsp;|&nbsp;<b>
+ <a class="menu" href="http://www.farfieldtechnology.com/services/">Services</a>
+ </b></nobr><nobr>&nbsp;|&nbsp;<b> <a class="menu" 
+href="http://www.farfieldtechnology.com/casestudies/">Case Studies</a> </b></nobr><nobr>&nbsp;|&nbsp;<b>
+ <a class="menu" href="http://www.farfieldtechnology.com/purchase/">Purchase</a>
+ </b></nobr><nobr>&nbsp;|&nbsp;<b> <a class="menu" 
+href="http://www.farfieldtechnology.com/download/">Downloads</a> </b></nobr><nobr>&nbsp;|&nbsp;<b>
+ <a class="menu" href="http://www.farfieldtechnology.com/support/">Support</a>
+ </b></nobr><nobr>&nbsp;|&nbsp;<b> <a class="menu" 
+href="http://www.farfieldtechnology.com/company/">Company</a> </b></nobr>
+ &nbsp; </font></td></tr></tbody></table>
+</td></tr>
+<tr bgcolor="#0088bb"><td colspan="3" height="5"><img 
+src="rbffaq_files/08B.gif" height="5" width="100%"></td></tr></tbody></table>
+<table border="0" cellpadding="2" cellspacing="0"><tbody><tr><td 
+style="padding-top: 0pt;" bgcolor="#ccddee"><font> &nbsp; <nobr><b> <a 
+class="menu" href="http://www.farfieldtechnology.com/">Home</a> </b></nobr><nobr>»<b>
+ <a class="menu" href="http://www.farfieldtechnology.com/products/">Products</a>
+ </b></nobr><nobr>»<b> <a class="menu" 
+href="http://www.farfieldtechnology.com/products/toolbox/">Toolbox</a> </b></nobr><nobr>»<b>
+ <a class="menu" 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/">Theory</a>
+ </b></nobr><nobr>»<b> RBF interpolation FAQ </b></nobr> &nbsp; </font></td><td
+ width="40"></td></tr></tbody></table></div>
+<script language="javascript"><!--S
+if (!document.all && document.getElementById) document.all=document.getElementById;
+//--></script>
+<div id="body">
+<h2>Interpolating scattered data with RBFs</h2>
+
+<ul>
+<li><a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#SECTION00021000000000000000"
+ name="tex2html20">What is
+the interpolation problem?</a></li>
+
+<li><a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#SECTION00022000000000000000"
+ name="tex2html21">What is
+an RBF?</a></li>
+
+<li><a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#SECTION00023000000000000000"
+ name="tex2html22">What is
+a basic function?</a></li>
+
+<li><a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#SECTION00024000000000000000"
+ name="tex2html23">Why are
+RBFs suited to scattered data
+interpolation?</a></li>
+
+<li><a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#SECTION00025000000000000000"
+ name="tex2html24">How do
+we find an RBF interpolant?</a></li>
+
+<li><a href="#SECTION00026000000000000000">Why do I need FarField's <i>
+FastRBF<sup>TM</sup></i> engine?</a></li>
+
+<li><a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/directmethods.html">What
+ are direct methods (the alternative to FastRBF<sup>TM</sup>)?</a></li>
+<li><a href="#greedyfit">Greedy fitting - How does data
+compression come about?</a></li>
+<li><a href="#fittolerence">What is a fitting tolerance and why specify 
+one?</a></li>
+</ul>
+
+<h4><a name="SECTION00021000000000000000"></a>What is the interpolation
+problem?</h4>
+
+We want to
+approximate a real valued function&nbsp;<img src="rbffaq_files/img2.png"
+ alt="$ f(\vec{x})$" align="CENTER" border="0" height="35" width="40">by&nbsp;<img
+ src="rbffaq_files/img3.png" alt="$ s(\vec{x})$" align="CENTER" 
+border="0" height="35" width="38">given the set of values&nbsp;<img 
+src="rbffaq_files/img4.png" alt="$ \vec{f}=(f_1,\dots,f_N)$" 
+align="CENTER" border="0" height="35" width="129">at the distinct
+points&nbsp;<img src="rbffaq_files/img5.png" alt="$ 
+X=\{\vec{x}_1,\dots,\vec{x}_N\}\subset\ensuremath{\mathbb{R}}^d$" 
+align="CENTER" border="0" height="38" width="187">.
+
+
+<h4><a name="SECTION00022000000000000000"></a>What is an
+RBF?</h4>
+
+We choose&nbsp;<img src="rbffaq_files/img3.png" alt="$ s(\vec{x})$" 
+align="CENTER" border="0" height="35" width="38">to be a Radial Basis 
+Function of
+the form 
+
+<a name="rbf"></a>
+<table cellpadding="0" width="100%">
+<tbody><tr>
+<td align="center"><img src="rbffaq_files/img6.png" alt="" border="0" 
+height="72" width="343"></td>
+<td align="RIGHT" width="10">
+(1)</td>
+</tr>
+</tbody></table>
+<p>where&nbsp;<img src="rbffaq_files/img7.png" alt="$ p$" align="CENTER"
+ border="0" height="35" width="13"> is a polynomial of degree at 
+most&nbsp;<img src="rbffaq_files/img8.png" alt="$ k$" align="BOTTOM" 
+border="0" height="18" width="14">
+,&nbsp;<img src="rbffaq_files/img21.png" alt="$ \lambda_i$" 
+align="CENTER" border="0" height="35" width="20"> is a real-valued 
+weight,&nbsp;<img src="rbffaq_files/img9.png" alt="$ \vert\cdot\vert$" 
+align="CENTER" border="0" height="35" width="27"> denotes the Euclidean 
+norm,&nbsp;<img src="rbffaq_files/img10.png" alt="$ \phi$" 
+align="CENTER" border="0" height="35" width="15"> is a <i>basic function</i>,&nbsp;<img
+ src="rbffaq_files/img11.png" alt="$ 
+\phi:\ensuremath{\mathbb{R}}^+\to\ensuremath{\mathbb{R}}$" 
+align="CENTER" border="0" height="36" width="93">, and<img 
+src="rbffaq_files/img12.png" alt="$ \vert\vec{x}- \vec{x}_i\vert$" 
+align="CENTER" border="0" height="35" width="64"> is simply a
+distance -- how far&nbsp;<img src="rbffaq_files/img13.png" alt="$ 
+\vec{x}$" align="BOTTOM" border="0" height="18" width="16"> is from the 
+point&nbsp;<img src="rbffaq_files/img14.png" alt="$ \vec{x}_i$" 
+align="CENTER" border="0" height="35" width="21">.
+</p><ul>
+<li>An RBF is a
+weighted sum of translations of a radially symmetric basic
+function augmented by a polynomial term.</li>
+</ul>
+
+<h4><a name="SECTION00023000000000000000"></a>What is a basic
+function?</h4>
+
+<p>The basic
+function&nbsp;<img src="rbffaq_files/img10.png" alt="$ \phi$" 
+align="CENTER" border="0" height="35" width="15">, in this context, is a
+ real
+function of a positive real&nbsp;<img src="rbffaq_files/img15.png" 
+alt="$ r$" align="BOTTOM" border="0" height="18" width="13">, 
+where&nbsp;<img src="rbffaq_files/img15.png" alt="$ r$" align="BOTTOM" 
+border="0" height="18" width="13"> is the distance (radius) from the 
+origin. Popular
+choices for&nbsp;<img src="rbffaq_files/img10.png" alt="$ \phi$" 
+align="CENTER" border="0" height="35" width="15"> include 
+</p><ul>
+<li>The thin-plate
+spline&nbsp;<img src="rbffaq_files/img16.png" alt="$ 
+\phi(r)=r^2\log(r)$" align="CENTER" border="0" height="37" width="123"> 
+(for fitting smooth
+functions of two variables)</li>
+
+<li>The Gaussian&nbsp;
+<img src="rbffaq_files/img17.png" alt="$ \phi(r)=\exp(-cr^2)$" 
+align="CENTER" border="0" height="37" width="137"> (mainly for neural
+networks)</li>
+
+<li>The
+multiquadric&nbsp;<img src="rbffaq_files/img18.png" alt="$ 
+\phi(r)=\sqrt{r^2+c^2}$" align="CENTER" border="0" height="40" 
+width="127"> (for various
+applications, in particular fitting to topographical
+data)</li>
+</ul>
+
+<p>For fitting
+functions of three variables, good choices include 
+
+</p><ul>
+<li>The biharmonic
+(<img src="rbffaq_files/img19.png" alt="$ \phi(r)=r$" align="CENTER" 
+border="0" height="35" width="68">) spline + linear
+polynomial</li>
+
+<li>The triharmonic
+(<img src="rbffaq_files/img20.png" alt="$ \phi(r)=r^3$" align="CENTER" 
+border="0" height="37" width="76">) spline + quadratic
+polynomial</li>
+</ul>
+
+<p>These polyharmonic
+splines (which include the thin-plate spline) minimise certain
+energy semi-norms and are therefore the ``smoothest''
+interpolators. Note that the associated basic functions are not
+compactly supported - <i>they grow as r&nbsp; increases from the
+origin</i>. 
+
+</p><h4><a name="SECTION00024000000000000000"></a>Why are RBFs suited to
+scattered data interpolation?</h4>
+
+<p>RBFs are popular for
+interpolating scattered data as the associated system of linear
+equations is guaranteed to be invertible under very mild
+conditions on the locations of the data points. For example, the
+thin-plate spline only requires that the points are not co-linear
+while the Gaussian and multiquadric place no restrictions on the
+locations of the points. In particular, RBFs do not require that
+the data lie on any sort of regular grid. 
+
+</p><h4><a name="SECTION00025000000000000000"></a>How do we find an RBF
+interpolant?</h4>
+
+<p>The RBF interpolant&nbsp;
+<img src="rbffaq_files/img3.png" alt="$ s(\vec{x})$" align="CENTER" 
+border="0" height="35" width="38"> is defined by the coefficients of
+the polynomial&nbsp;<img src="rbffaq_files/img7.png" alt="$ p$" 
+align="CENTER" border="0" height="35" width="13">&nbsp; and the 
+weights&nbsp;<img src="rbffaq_files/img21.png" alt="$ \lambda_i$" 
+align="CENTER" border="0" height="35" width="20">. <br>
+Given the
+interpolation values&nbsp;<img src="rbffaq_files/img4.png" alt="$ 
+\vec{f}=(f_1,\dots,f_N)$" align="CENTER" border="0" height="35" 
+width="129">, we seek the
+weights<img src="rbffaq_files/img21.png" alt="$ \lambda_i$" 
+align="CENTER" border="0" height="35" width="20"> so that the RBF
+satisfies 
+
+</p><center><a name="interp-conditions"></a></center>
+
+<center>
+<table cellpadding="0" width="100%">
+<tbody><tr valign="CENTER">
+<td nowrap="nowrap" align="CENTER"><img src="rbffaq_files/img22.png" 
+alt="$\displaystyle s(\vec{x}_i) = f_i \qquad i=1,\dots,N.$" 
+align="CENTER" border="0" height="35" width="211"></td>
+<td nowrap="nowrap" align="RIGHT" width="10">
+(2)</td>
+</tr>
+</tbody></table>
+</center>
+
+<p>Because this gives
+an under-determined system, <i>i.e.,</i> there are more
+parameters than data, the orthogonality or side
+conditions 
+
+</p><center><a name="side-conditions"></a></center>
+
+<center>
+<table cellpadding="0" width="100%">
+<tbody><tr valign="CENTER">
+<td nowrap="nowrap" align="CENTER"><img src="rbffaq_files/sidecond.png" 
+alt="$\displaystyle \sum_{j=1}^{N} \lambda_j q(\vec{x}_j) = 0$" 
+align="CENTER" border="0" height="72" width="122"> for all 
+polynomials&nbsp;<img src="rbffaq_files/img7.png" alt="$ p$" 
+align="CENTER" border="0" height="35" width="13">of degree at most&nbsp;<img
+ src="rbffaq_files/img8.png" alt="$ k$" align="BOTTOM" border="0" 
+height="18" width="14">
+.</td>
+<td nowrap="nowrap" align="RIGHT" width="10">
+(3)</td>
+</tr>
+</tbody></table>
+</center>
+
+<p>are further imposed
+on the coefficients&nbsp;<img src="rbffaq_files/img25.png" alt="$ 
+\vec{\lambda}=(\lambda_1,\dots,\lambda_N)$" align="CENTER" border="0" 
+height="35" width="132">. <br>
+Let&nbsp;<img src="rbffaq_files/img26.png" alt="$ \{p_1,\dots,p_\ell\}$"
+ align="CENTER" border="0" height="35" width="92">be a basis for 
+polynomials
+of degree at most&nbsp;<img src="rbffaq_files/img8.png" alt="$ k$" 
+align="BOTTOM" border="0" height="18" width="14">and let&nbsp;<img 
+src="rbffaq_files/img27.png" alt="$ \vec{c}=(c_1,\dots,c_\ell)$" 
+align="CENTER" border="0" height="35" width="118">be the
+coefficients that give&nbsp;<img src="rbffaq_files/img7.png" alt="$ p$" 
+align="CENTER" border="0" height="35" width="13">in terms of this basis.
+Then Equation (<a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#interp-conditions">2</a>)
+ and
+(<a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#side-conditions">3</a>)
+ may be written in
+matrix form as 
+
+</p><center><a name="rbf-system"></a></center>
+
+<center>
+<table cellpadding="0" width="100%">
+<tbody><tr valign="CENTER">
+<td nowrap="nowrap" align="CENTER"><img src="rbffaq_files/img28.png" 
+alt="$\displaystyle \begin{pmatrix}A &amp; P P{{}^{\mathsf{T}}}&amp; 0 
+\end{pmatrix} \beg......c{\lambda} \vec{c}\end{pmatrix} = 
+\begin{pmatrix}\vec{f} 0 \end{pmatrix},$" align="CENTER" border="0" 
+height="60" width="192"></td>
+<td nowrap="nowrap" align="RIGHT" width="10">
+(4)</td>
+</tr>
+</tbody></table>
+</center>
+
+<p>where 
+
+</p><center>
+<table cellpadding="0" width="100%">
+<tbody><tr valign="CENTER">
+<td nowrap="nowrap" align="RIGHT"><img src="rbffaq_files/img29.png" 
+alt="$\displaystyle A_{i,j}$" align="CENTER" border="0" height="35" 
+width="33"></td>
+<td nowrap="nowrap" align="LEFT"><img src="rbffaq_files/img30.png" 
+alt="$\displaystyle = \phi(\vert\vec{x}_i - \vec{x_j}\vert),$" 
+align="CENTER" border="0" height="35" width="119"></td>
+<td nowrap="nowrap" align="RIGHT"><img src="rbffaq_files/img31.png" 
+alt="$\displaystyle i,j$" align="CENTER" border="0" height="35" 
+width="26"></td>
+<td nowrap="nowrap" align="LEFT"><img src="rbffaq_files/img32.png" 
+alt="$\displaystyle = 1,\dots, N,$" align="CENTER" border="0" 
+height="35" width="90"></td>
+<td nowrap="nowrap" align="RIGHT" width="10">
+&nbsp;</td>
+</tr>
+
+<tr valign="CENTER">
+<td nowrap="nowrap" align="RIGHT"><img src="rbffaq_files/img33.png" 
+alt="$\displaystyle P_{i,j}$" align="CENTER" border="0" height="35" 
+width="31"></td>
+<td nowrap="nowrap" align="LEFT"><img src="rbffaq_files/img34.png" 
+alt="$\displaystyle = p_j(\vec{x}_i),$" align="CENTER" border="0" 
+height="35" width="74"></td>
+<td nowrap="nowrap" align="RIGHT"><img src="rbffaq_files/img35.png" 
+alt="$\displaystyle i$" align="CENTER" border="0" height="35" width="10"></td>
+<td nowrap="nowrap" align="LEFT"><img src="rbffaq_files/img36.png" 
+alt="$\displaystyle = 1,\dots, N, \quad j = 1,\dots, \ell.$" 
+align="CENTER" border="0" height="35" width="201"></td>
+<td nowrap="nowrap" align="RIGHT" width="10">
+&nbsp;</td>
+</tr>
+</tbody></table>
+</center>
+
+<p>Solving the linear
+system (<a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#rbf-system">4</a>)
+determines <b><i>
+c</i></b> and&nbsp;<img src="rbffaq_files/lambda.png" alt="$ \lambda_i$"
+ align="ABSCENTER" border="0" height="18" width="16">, hence<img 
+src="rbffaq_files/img3.png" alt="$ s(\vec{x})$" align="CENTER" 
+border="0" height="35" width="38">. 
+
+</p><h4><a name="SECTION00026000000000000000"></a>Why do I need 
+FarField's <i>
+FastRBF<sup>TM</sup></i> engine?</h4>
+
+<p>Basic functions,
+such as the polyharmonic splines, that have desirable
+approximation properties, tend to have non-compact support and
+grow arbitrarily large. This means that the matrix&nbsp;<img 
+src="rbffaq_files/img38.png" alt="$ A$" align="BOTTOM" border="0" 
+height="17" width="17"> in Equation (<a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#rbf-system">4</a>)
+ is
+not sparse and, except for symmetry, has no structure that can be
+exploited for solving the system. This means direct solution of
+Equation (<a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#rbf-system">4</a>)
+ requires
+<img src="rbffaq_files/img39.png" alt="$ \ensuremath{\mathcal{O}}(N^3)$"
+ align="CENTER" border="0" height="37" width="56"> operations and&nbsp;
+<img src="rbffaq_files/img40.png" alt="$ \ensuremath{\mathcal{O}}(N^2)$"
+ align="CENTER" border="0" height="37" width="56"> storage.
+Moreover, naïve evaluation of Equation (<a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#rbf">1</a>)
+ at&nbsp;<img src="rbffaq_files/img41.png" alt="$ M$" align="BOTTOM" 
+border="0" height="17" width="23"> points requires&nbsp;
+<img src="rbffaq_files/img42.png" alt="$ \ensuremath{\mathcal{O}}(MN)$" 
+align="CENTER" border="0" height="35" width="67"> operations. This
+has led many authors to conclude that RBFs are suitable for small
+problems with up to a few thousand points.&nbsp; However, FarField's <i>
+FastRBF<sup>TM</sup></i> solvers are based on new
+mathematical algorithms that reduce the fitting task down to
+just&nbsp;<img src="rbffaq_files/img43.png" alt="$ 
+\ensuremath{\mathcal{O}}(N\log(N))$" align="CENTER" border="0" 
+height="35" width="103"> operations and&nbsp;<img 
+src="rbffaq_files/img44.png" alt="$ \ensuremath{\mathcal{O}}(N)$" 
+align="CENTER" border="0" height="35" width="48"> storage, and the
+evaluation task down to just&nbsp;<img src="rbffaq_files/img43.png" 
+alt="$ \ensuremath{\mathcal{O}}(N\log(N))$" align="CENTER" border="0" 
+height="35" width="103"> setup then&nbsp;<img 
+src="rbffaq_files/img45.png" alt="$ \ensuremath{\mathcal{O}}(M)$" 
+align="CENTER" border="0" height="35" width="51"> operations.
+Furthermore, these fast methods run on standard desktop
+hardware, even when the number of data points exceeds one
+million. Previously, even storage of the system (<a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#rbf-system">4</a>)
+ has been
+impossible. 
+
+</p><p>It should also be
+noted that with the naïve approach, the matrix in Equation
+(<a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#rbf-system">4</a>)
+ typically has poor
+conditioning. This means that substantial errors will easily
+creep into any standard numerical solution.<br>
+&nbsp;<br>
+</p>
+
+<a name="buddha"></a><table cols="1" width="100%">
+<tbody><tr>
+<td align="CENTER"><img src="rbffaq_files/buddhafit3.jpg" alt="Iterative
+ fitting of an RBF to the Buddha sculpture" height="293" width="507"></td>
+</tr>
+
+<tr>
+<td align="CENTER">
+Iterations from a `greedy' fit of an RBF to laser surface scan data</td>
+</tr>
+</tbody></table>
+
+
+<h4><a name="greedyfit"></a>Greedy fitting - How does data compression 
+come
+about?</h4>
+
+
+The equations which define
+an RBF interpolant <a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/rbffaq.html#SECTION00025000000000000000">(Eq.
+ 4)</a> imply that the number of terms in the RBF
+equals the number of data points. <br>
+<i>FastRBF<sup>TM</sup></i> provides a reduction option
+which uses a <i>greedy</i> algorithm to iteratively add data 
+points to the RBF so that the data may be
+modelled with fewer terms to the same desired accuracy. This process is 
+graphically illustrated
+above and in the associated <a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/buddha_newfit3a.mpg">MPEG
+(1.2MB)</a> where an RBF is iteratively fitted to laser scan data from 
+the smiling
+Buddha figurine. The RBF surface modelling process is described in the <a
+ 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/surfacefaq.html">surfacing
+ FAQ</a>. The figure illustrates how the zero-valued
+iso-surface of the fitted RBF more closely approximates the object
+as more terms are added. The original data, consisting of 543,000
+vertices, was modelled by 82,000 terms to within 1e-4
+accuracy - a significant reduction in data.
+<ul>
+<li>The RBF is
+guaranteed to pass through ALL the data points to within the
+user-specified precision.</li>
+</ul>
+
+<h4><a name="fittolerence"></a>What is a fitting tolerance and why 
+specify one?</h4>
+
+<i>FastRBF<sup>TM</sup></i> allows  users to specify a fitting tolerance
+ and solve the 
+corresponding inexact  interpolation problem,
+<p>
+</p><div align="CENTER"><a name="inexact_fit"></a>
+<table align="CENTER" cellpadding="0" width="100%">
+<tbody><tr valign="MIDDLE">
+<td nowrap="nowrap" align="CENTER"><img src="rbffaq_files/inexact.png" 
+alt="$\displaystyle \vert f_i - s(\vec{x}_i) \vert \leq \epsilon, \qquad
+ i =1, \ldots, N.$" align="MIDDLE" border="0" height="35" width="257"></td>
+<td nowrap="nowrap" align="RIGHT" width="10">
+
+(5)</td></tr>
+</tbody></table></div><p></p>
+<p>
+where <img src="rbffaq_files/epsilon_i.png" alt="$\epsilon_i" 
+align="MIDDLE" border="0" height="35" width="17"> is the tolerance at 
+each data point. The RBF fitted is 
+guaranteed to be within the specified fitting tolerance. Specifying an 
+acceptable tolerance 
+results in much faster fitting times, even when centre reduction (greedy
+ fitting) is not specified.
+A tolerance also gives some robustness to low level noise on the data. 
+Better methods for optimally fitting
+to noisy data are discussed in the <a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/smoothrbf.html">smoothing
+ and approximation FAQ</a>.
+</p>
+<p>
+The figure below illustrates the  affect of the specifying a fitting 
+tolerance. The first 
+image is an exact <i>FastRBF<sup>TM</sup></i> fit to the data - there is
+ no difference between 
+the RBF surface and the original surface data. In the second image a 1mm
+ tolerance has been specified, 
+resulting in some deviation from the raw data, but within the 1mm 
+tolerance. In the final image a greedy fit 
+has been employed to reduce the number of centres required to represent 
+the surface to within 1mm.
+The number of centres has reduced from 6400 to 1800. The greedy fit has 
+utilised the maximum 1mm 
+deviation specified by the user at several of the original mesh 
+vertices, this deviation is exaggerated by 
+the colour scale which indicates the 1mm extremes by the blue and red 
+colours. The head is 225mm x 150mm
+and the 1mm deviation is  not noticeable at this scale and consequently 
+suitable for many 
+graphics applications.
+</p>
+<table cols="1" width="100%">
+<tbody><tr>
+<td align="CENTER"><img src="rbffaq_files/fit_strategies.jpg" alt="RBF 
+fitting strategies" height="298" width="715"></td>
+</tr>
+<tr>
+<td align="CENTER">
+FastRBF fitting strategies with deviation from original data colour 
+coded. (a) Exact fit to mesh vertices (6400 centres) (b) Fit to all mesh
+ vertices to an accuracy of 1mm (6400 centres) (c) Greedy fit to an 
+accuracy within 1mm (1800 centres).</td>
+</tr>
+</tbody></table>
+
+<p>
+<table align="left" cellpadding="5">
+<tbody><tr>
+<td><a 
+href="http://www.farfieldtechnology.com/products/toolbox/theory/index.html"><img
+ src="rbffaq_files/back.gif"></a></td><td valign="middle"><b>FastRBF FAQ</b></td></tr>
+</tbody></table><br><br>
+</p>
+
+
+
+
+
+
+</div><div id="footermark" style="width: 100%; clear: both;" 
+name="footermark"><p style="font-size: 1px;">&nbsp;</p></div>
+<div id="footer" style="width: 100%; clear: both; padding-bottom: 4px; 
+position: relative; top: 0pt;">
+<table border="0" cellpadding="0" cellspacing="2" width="100%">
+<tbody><tr bgcolor="#0088bb" height="5"><td><img 
+src="rbffaq_files/08B.gif" height="5" width="100%"></td></tr>
+<tr><td align="center"><font size="-2">© Copyright FarField Technology 
+2001. All rights reserved. <i>Page last updated: August 2002</i>. <a 
+href="mailto:email@farfieldtechnology.com">email@farfieldtechnology.com</a>.<br>Patents
+ pending on aspects of FarField's FastRBF technology.
+</font></td></tr></tbody></table>
+</div>
+<script language="javascript"><!--S
+var footer; var mark;
+function moveit() {
+    r=window.getHeight()-mark.offsetTop-footer.offsetHeight;
+    footer.style.top=(r>0)?r:0;
+}
+if (document.all) { 
+  footer=document.all('footer'); mark=document.all("footermark");
+  footer.style.position='relative';
+	window.getHeight = (window.innerHeight)
+    ? new Function('', '{ return this.innerHeight; }')
+    : new Function('', '{ return this.document.body.clientHeight; }');
+  moveit(); window.onresize=moveit; 
+}
+//--></script>
+</body></html>
