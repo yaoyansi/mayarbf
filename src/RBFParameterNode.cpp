@@ -56,7 +56,7 @@ void RBFParameterNode::draw( M3dView& view,
 	glPushAttrib( GL_CURRENT_BIT );
 		//
 		glColor3f(1.0f, 0.0f, 1.0f);
-		glutWireCube(3.0f);
+		drawWireCuboctahedron();
 
 	glPopAttrib();
 	view.endGL();
